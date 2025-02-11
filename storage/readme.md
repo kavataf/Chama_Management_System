@@ -1,0 +1,1 @@
+All storage logics here

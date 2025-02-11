@@ -1,0 +1,1 @@
+Column 'trainee_centre_id' cannot be null
