@@ -28,23 +28,16 @@ $savings = array();
                     <div class="row">
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-member-name">Member Name</label>
-                            <input type="text" class="form-control" name="member_name" id="update-member-name" required>
+                            <input type="text" class="form-control" name="user_name" id="update-member-name" required>
                         </div>
-                        <div class="form-group col-sm-12 col-lg-4 col-xl-4">
-                            <label for="update-member-id-no">ID No</label>
-                            <input type="text" class="form-control" name="member_id_no" id="update-member-id-no" required>
-                        </div>
-                        <div class="form-group col-sm-12 col-lg-4 col-xl-4">
-                            <label for="update-member-phone">Contact</label>
-                            <input type="text" class="form-control" name="member_phone" id="update-member-phone" required>
-                        </div>
+                        
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-reference-no">Ref. No</label>
                             <input type="text" class="form-control" name="reference_no" id="update-reference-no" required>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-amount">Amount</label>
-                            <input type="amount" class="form-control" name="amount" id="update-amount" required>
+                            <input type="number" class="form-control" name="amount" id="update-amount" required>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-savings-date">Date</label>
@@ -96,8 +89,6 @@ $savings = array();
     function setUpdateModalData(element) {
         document.getElementById('update-saving-id').value = element.getAttribute('data-id');
         document.getElementById('update-member-name').value = element.getAttribute('data-name');
-        document.getElementById('update-member-id-no').value = element.getAttribute('data-no');
-        document.getElementById('update-member-phone').value = element.getAttribute('data-phone');
         document.getElementById('update-reference-no').value = element.getAttribute('data-ref');
         document.getElementById('update-amount').value = element.getAttribute('data-amount');
         document.getElementById('update-savings-date').value = element.getAttribute('data-date');

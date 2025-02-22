@@ -13,7 +13,7 @@ if(isset($_POST['loan_details'])){
     // prepare
     $stmt = $mysqli -> prepare("INSERT INTO repayments (member_name, member_id_no, loan_name, 
     loan_amount, loan_interest, processing_fee, amount_paid) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt -> bind_param("sssssss", $member_name, $member_id_no, $loan_name, $loan_amount, 
+    $stmt -> bind_param("sisiiii", $member_name, $member_id_no, $loan_name, $loan_amount, 
     $loan_interest, $processing_fee, $amount_paid);
 
     if ($stmt->execute()) {

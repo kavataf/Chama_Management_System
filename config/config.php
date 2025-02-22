@@ -29,5 +29,5 @@ if (!empty($_SERVER['HTTPS']) && ('on' == $_SERVER['HTTPS'])) {
 $uri .= $_SERVER['HTTP_HOST'];
 
 /* Global directory */
-$base_dir = $uri . "/cic/views/";
+$base_dir = $uri . "/COMS/views/";
 global $base_dir;

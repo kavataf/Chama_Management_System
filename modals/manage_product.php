@@ -32,7 +32,7 @@ $products = array();
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-loan-interest">Loan Interest</label>
-                            <input type="text" class="form-control" name="loan_interest" id="update-loan-interest" required>
+                            <input type="number" class="form-control" name="loan_interest" id="update-loan-interest" required>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-loan-duration">Loan Duration</label>
@@ -40,11 +40,11 @@ $products = array();
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-processing-fee">Processing Fee</label>
-                            <input type="text" class="form-control" name="processing_fee" id="update-processing-fee" required>
+                            <input type="number" class="form-control" name="processing_fee" id="update-processing-fee" required>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-maximum-limit">Maximum Limit</label>
-                            <input type="text" class="form-control" name="maximum_limit" id="update-maximum-limit" required>
+                            <input type="number" class="form-control" name="maximum_limit" id="update-maximum-limit" required>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-loan-guarantors">Loan Guarantors</label>
@@ -56,11 +56,11 @@ $products = array();
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-member-savings">Member Savings</label>
-                            <input type="text" class="form-control" name="member_savings" id="update-member-savings" required>
+                            <input type="number" class="form-control" name="member_savings" id="update-member-savings" required>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-loan-penalty">Loan Penalty</label>
-                            <input type="text" class="form-control" name="loan_penalty" id="update-loan-penalty" required>
+                            <input type="number" class="form-control" name="loan_penalty" id="update-loan-penalty" required>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-loan-description">Loan Description</label>

@@ -24,6 +24,7 @@ if (isset($_POST['member_details'])) {
 
         if ($stmt->execute()) {
             $user_id = $mysqli->insert_id; // Get the generated user ID
+            $_SESSION['user_id'] = $user_id;
 
             // Prepare to insert into members table
             $stmt2 = $mysqli->prepare("INSERT INTO members (user_id, member_name, member_gender, 

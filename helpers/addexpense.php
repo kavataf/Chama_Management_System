@@ -10,7 +10,7 @@ if(isset($_POST['expense_details'])){
     // prepare
     $stmt = $mysqli -> prepare("INSERT INTO expenses (vendor_name, expense_type, reference_no, 
     expense_amount) VALUES (?, ?, ?, ?)");
-    $stmt -> bind_param("ssss", $vendor_name, $expense_type, $reference_no, $expense_amount);
+    $stmt -> bind_param("sssi", $vendor_name, $expense_type, $reference_no, $expense_amount);
 
     if ($stmt->execute()) {
         $_SESSION['success'] = "expense details added successfully";

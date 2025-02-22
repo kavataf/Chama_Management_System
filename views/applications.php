@@ -10,6 +10,18 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$applications = array();
+$sql = "SELECT a.*, u.user_name
+FROM applications a
+JOIN users u
+WHERE u.user_id = a.user_id";
+$result = $mysqli -> query($sql);
+if($result -> num_rows > 0){
+    while($row = $result -> fetch_assoc()){
+        $applications[] = $row;
+    }
+}
+
 ?>
 
 <body id="page-top">
@@ -34,7 +46,75 @@ if (!isset($_SESSION['user_id'])) {
             <div class="level">
 
                 <?php if ($user_role == 'System Administrator') : ?>
-                
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card card-yellow card-outline">
+                                <div class="card-header">
+                                    <div class="d-sm-flex align-items-center justify-content-between mb-0">
+                                        <h5 class="card-title m-0">Loan Application Status</h5>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-12 table-responsive">
+                                            <!-- breakdown table -->
+                                            <table class="table table-bordered" id="datatable">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 10px">No</th>
+                                                        <th>Member Name</th>
+                                                        <th>Loan Name</th>
+                                                        <th>Loan Amount</th>
+                                                        <th>Loan Duration</th>
+                                                        <th>Application Date</th>
+                                                        <th>Purpose</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php if (!empty($applications)) : ?>
+                                                    <?php foreach ($applications as $key => $application) : ?>
+                                                    <tr>
+                                                        <td><?php echo ($key + 1); ?></td>
+                                                        <td><?php echo htmlspecialchars($application['user_name']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($application['loan_name']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($application['loan_amount']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($application['loan_duration']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($application['application_date']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($application['loan_purpose']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($application['loan_status']); ?>
+                                                        </td>
+                                                        <td>
+                                                            <form method="POST" action="verify_loan.php">
+                                                                <input type="hidden" name="application_id" value="<?php echo $application['application_id']; ?>">
+                                                                <button class="badge badge-success mb-2" type="submit" name="action" value="approve">Approve</button>
+                                                                <button class="badge badge-danger" type="submit" name="action" value="reject">Reject</button>
+                                                            </form>
+                                                        </td>
+
+
+                                                    </tr>
+                                                    <?php endforeach; ?>
+                                                    <?php else : ?>
+                                                    <tr>
+                                                        <td colspan="8">No records found</td>
+                                                    </tr>
+                                                    <?php endif; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 <!-- Members Dashboard -->
                 <?php elseif ($user_role == 'Member') : ?>

@@ -33,7 +33,7 @@ if (isset($_POST['update_saving'])) {
 
             if ($stmt_update = $mysqli->prepare($sql)) {
                 $stmt_update->bind_param(
-                    'sssssssi',
+                    'siisidsi',
                     $member_name, $member_id_no, $member_phone, $reference_no, $amount, $savings_date, $payment_method, $expense_id
                 );
 

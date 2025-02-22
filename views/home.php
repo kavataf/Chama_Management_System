@@ -123,157 +123,161 @@ if($result -> num_rows > 0){
                     <!-- /.col-md-6 -->
                     <!-- Applications Breakdown Per Sub county -->
                 </div>
-                <!-- member growth chart -->
-                <h3 style="color: #333; font-weight: bold;">📊 Member Growth Over Time</h3>
-                <div class="chart-container" width="600px" height="400px">
-                    <canvas id="memberGrowthChart" width="100%" height="400"></canvas>
-                </div>
+                <div class="row">
+                    <div class="col-xl-6">
+                        <!-- member growth chart -->
+                        <h3 style="color: #333; font-weight: bold;">📊 Member Growth Over Time</h3>
+                        <div class="chart-container" width="300px" height="400px">
+                            <canvas id="memberGrowthChart" width="100%" height="400px"></canvas>
+                        </div>
 
-                <!-- <script>
-                    // Fetch member growth data from PHP
-                    fetch('fetch_member_growth.php')
-                        .then(response => response.json())
-                        .then(data => {
-                            const ctx = document.getElementById('memberGrowthChart').getContext('2d');
+                        <!-- <script>
+                            // Fetch member growth data from PHP
+                            fetch('fetch_member_growth.php')
+                                .then(response => response.json())
+                                .then(data => {
+                                    const ctx = document.getElementById('memberGrowthChart').getContext('2d');
 
-                            new Chart(ctx, {
-                                type: 'line',
-                                data: {
-                                    labels: data.labels, // Months/Years
-                                    datasets: [{
-                                        label: 'Total Members',
-                                        data: data.values, // Total members count
-                                        borderColor: 'blue',
-                                        backgroundColor: 'rgba(0, 0, 255, 0.1)',
-                                        borderWidth: 2,
-                                        fill: true
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true
-                                        }
-                                    }
-                                }
-                            });
-                        })
-                        .catch(error => console.error('Error fetching data:', error));
-                </script> -->
-
-
-                <script>
-                    document.addEventListener("DOMContentLoaded", function () {
-                        const ctx = document.getElementById('memberGrowthChart').getContext('2d');
-
-                        // Sample data (replace this with data from your database)
-                        const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                        const membersData = [20, 45, 60, 80, 95, 120, 150, 190, 220, 250, 280, 320];
-
-                        new Chart(ctx, {
-                            type: 'line',
-                            data: {
-                                labels: labels,
-                                datasets: [{
-                                    label: 'Total Members',
-                                    data: membersData,
-                                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                    borderColor: 'rgba(54, 162, 235, 1)',
-                                    borderWidth: 2,
-                                    pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                                    pointRadius: 5,
-                                    tension: 0.3 // Smooth curve effect
-                                }]
-                            },
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    legend: {
-                                        display: true,
-                                        labels: {
-                                            color: '#333',
-                                            font: {
-                                                size: 14
+                                    new Chart(ctx, {
+                                        type: 'line',
+                                        data: {
+                                            labels: data.labels, // Months/Years
+                                            datasets: [{
+                                                label: 'Total Members',
+                                                data: data.values, // Total members count
+                                                borderColor: 'blue',
+                                                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                                                borderWidth: 2,
+                                                fill: true
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: true,
+                                            scales: {
+                                                y: {
+                                                    beginAtZero: true
+                                                }
                                             }
                                         }
-                                    }
-                                },
-                                scales: {
-                                    x: {
-                                        grid: {
-                                            display: false
-                                        }
+                                    });
+                                })
+                                .catch(error => console.error('Error fetching data:', error));
+                        </script> -->
+
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function () {
+                                const ctx = document.getElementById('memberGrowthChart').getContext('2d');
+
+                                // Sample data (replace this with data from your database)
+                                const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                                const membersData = [20, 45, 60, 80, 95, 120, 150, 190, 220, 250, 280, 320];
+
+                                new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        labels: labels,
+                                        datasets: [{
+                                            label: 'Total Members',
+                                            data: membersData,
+                                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                            borderWidth: 2,
+                                            pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                                            pointRadius: 5,
+                                            tension: 0.3 // Smooth curve effect
+                                        }]
                                     },
-                                    y: {
-                                        beginAtZero: true,
-                                        grid: {
-                                            color: 'rgba(200, 200, 200, 0.2)'
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    });
-                </script>
-
-                <!-- loan distribution chart -->
-                <h3 style="color: #333; font-weight: bold;">🏦 Loan Distribution Percentages</h3>
-                    
-                    <div class="chart-container" width = "600px" height = "500px">
-                        <canvas id="loanDistributionChart" width = "600px" height = "500px"></canvas>
-                    </div>
-
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            const ctx = document.getElementById('loanDistributionChart').getContext('2d');
-
-                            // Sample Data (Replace with real database values)
-                            const loanTypes = ["Personal Loan", "Business Loan", "Education Loan", "Emergency Loan"];
-                            const loanAmounts = [40, 25, 20, 15]; // Percentages of total loans
-
-                            new Chart(ctx, {
-                                type: 'pie',
-                                data: {
-                                    labels: loanTypes,
-                                    datasets: [{
-                                        label: 'Loan Distribution (%)',
-                                        data: loanAmounts,
-                                        backgroundColor: [
-                                            'rgba(54, 162, 235, 0.7)',  // Blue
-                                            'rgba(255, 99, 132, 0.7)',  // Red
-                                            'rgba(255, 206, 86, 0.7)',  // Yellow
-                                            'rgba(75, 192, 192, 0.7)'   // Green
-                                        ],
-                                        borderColor: [
-                                            'rgba(54, 162, 235, 1)',
-                                            'rgba(255, 99, 132, 1)',
-                                            'rgba(255, 206, 86, 1)',
-                                            'rgba(75, 192, 192, 1)'
-                                        ],
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: false, 
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'bottom',
-                                            labels: {
-                                                color: '#333',
-                                                font: {
-                                                    size: 14
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: {
+                                            legend: {
+                                                display: true,
+                                                labels: {
+                                                    color: '#333',
+                                                    font: {
+                                                        size: 14
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        scales: {
+                                            x: {
+                                                grid: {
+                                                    display: false
+                                                }
+                                            },
+                                            y: {
+                                                beginAtZero: true,
+                                                grid: {
+                                                    color: 'rgba(200, 200, 200, 0.2)'
                                                 }
                                             }
                                         }
                                     }
-                                }
+                                });
                             });
-                        });
-                    </script>
-              
+                        </script>
+                    </div>
+                    <div class="col-xl-6">
+                        <!-- loan distribution chart -->
+                        <h3 style="color: #333; font-weight: bold;">🏦 Loan Distribution Percentages</h3>
+                            
+                            <div class="chart-container" width = "400px" height = "400px">
+                                <canvas id="loanDistributionChart" width = "400px" height = "400px"></canvas>
+                            </div>
+
+                            <script>
+                                document.addEventListener("DOMContentLoaded", function () {
+                                    const ctx = document.getElementById('loanDistributionChart').getContext('2d');
+
+                                    // Sample Data (Replace with real database values)
+                                    const loanTypes = ["Personal Loan", "Business Loan", "Education Loan", "Emergency Loan"];
+                                    const loanAmounts = [40, 25, 20, 15]; // Percentages of total loans
+
+                                    new Chart(ctx, {
+                                        type: 'pie',
+                                        data: {
+                                            labels: loanTypes,
+                                            datasets: [{
+                                                label: 'Loan Distribution (%)',
+                                                data: loanAmounts,
+                                                backgroundColor: [
+                                                    'rgba(54, 162, 235, 0.7)',  // Blue
+                                                    'rgba(255, 99, 132, 0.7)',  // Red
+                                                    'rgba(255, 206, 86, 0.7)',  // Yellow
+                                                    'rgba(75, 192, 192, 0.7)'   // Green
+                                                ],
+                                                borderColor: [
+                                                    'rgba(54, 162, 235, 1)',
+                                                    'rgba(255, 99, 132, 1)',
+                                                    'rgba(255, 206, 86, 1)',
+                                                    'rgba(75, 192, 192, 1)'
+                                                ],
+                                                borderWidth: 1
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: false, 
+                                            maintainAspectRatio: false,
+                                            plugins: {
+                                                legend: {
+                                                    position: 'bottom',
+                                                    labels: {
+                                                        color: '#333',
+                                                        font: {
+                                                            size: 14
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                });
+                            </script>
+                    </div>
+              </div>
               <div style="width: 80%; margin: 0 auto;">
                     <canvas id="defaultersChart"></canvas>
               </div>

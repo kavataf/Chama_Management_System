@@ -11,7 +11,10 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // fetch
-$sql = "SELECT * FROM savings ";
+$sql = "SELECT s.savings_id, u.user_name, s.reference_no, s.amount, s.savings_date, s.payment_method 
+          FROM savings s
+          JOIN users u ON s.user_id = u.user_id
+          ORDER BY s.savings_date DESC";
 $result = $mysqli -> query($sql);
 $savings = array();
 if($result -> num_rows > 0){
@@ -55,8 +58,6 @@ if($result -> num_rows > 0){
                                                     <tr>
                                                         <th style="width: 10px">No</th>
                                                         <th>Member Name</th>
-                                                        <th>ID No</th>
-                                                        <th>Contact</th>
                                                         <th>Ref. No</th>
                                                         <th>Amount</th>
                                                         <th>Date</th>
@@ -69,11 +70,7 @@ if($result -> num_rows > 0){
                                                     <?php foreach ($savings as $key => $saving) : ?>
                                                     <tr>
                                                         <td><?php echo ($key + 1); ?></td>
-                                                        <td><?php echo htmlspecialchars($saving['member_name']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($saving['member_id_no']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($saving['member_phone']); ?>
+                                                        <td><?php echo htmlspecialchars($saving['user_name']); ?>
                                                         </td>
                                                         <td><?php echo htmlspecialchars($saving['reference_no']); ?>
                                                         </td>
@@ -87,9 +84,7 @@ if($result -> num_rows > 0){
                                                             <a data-toggle="modal" href="#updatesaving"
                                                                 class="badge badge-primary"
                                                                 data-id="<?php echo $saving['savings_id']; ?>"
-                                                                data-name="<?php echo htmlspecialchars($saving['member_name']); ?>"
-                                                                data-no="<?php echo htmlspecialchars($saving['member_id_no']); ?>"
-                                                                data-phone="<?php echo htmlspecialchars($saving['member_phone']); ?>"
+                                                                data-name="<?php echo htmlspecialchars($saving['user_name']); ?>"
                                                                 data-ref="<?php echo htmlspecialchars($saving['reference_no']); ?>"
                                                                 data-amount="<?php echo htmlspecialchars($saving['amount']); ?>"
                                                                 data-date="<?php echo htmlspecialchars($saving['savings_date']); ?>"

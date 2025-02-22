@@ -32,7 +32,7 @@ if(isset($_POST['product_details'])){
     // prepare
     $stmt = $mysqli -> prepare("INSERT INTO products (loan_name, loan_interest, loan_duration, processing_fee,
     maximum_limit, loan_guarantors, member_savings, thumbnail, loan_penalty, loan_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt -> bind_param("ssssssssss", $loan_name, $loan_interest, $loan_duration, $processing_fee, $maximum_limit, $loan_guarantors, 
+    $stmt -> bind_param("sisiisisis", $loan_name, $loan_interest, $loan_duration, $processing_fee, $maximum_limit, $loan_guarantors, 
     $member_savings, $thumbnail, $loan_penalty, $loan_description);
 
     if ($stmt->execute()) {

@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             if ($stmt_update = $mysqli->prepare($sql)) {
                 $stmt_update->bind_param(
-                    'sssssssssi',
+                    'sisiisiisi',
                     $loan_name, $loan_interest, $loan_duration, $processing_fee,
                     $maximum_limit, $loan_guarantors, $member_savings, $loan_penalty,
                     $loan_description, $product_id

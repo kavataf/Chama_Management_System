@@ -48,7 +48,7 @@ if(empty($user_name) || empty($user_email) || empty($user_password) || empty($co
     $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
     // prepare statement
     $stmt = $mysqli -> prepare("INSERT INTO users (user_name, user_email, user_password) VALUES (?, ?, ?)");
-    $stmt -> bind_param('sss', $user_name, $user_email, $hashed_password);
+    $stmt -> bind_param('sss', $user_name, $user_email, $user_password);
     if($stmt -> execute()){
         $_SESSION['success'] = "successful signup, please login";
         header("location: login.php");
