@@ -19,6 +19,29 @@ if($result -> num_rows > 0){
     }
 }
 
+$user_id = $_SESSION['user_id'];
+
+$sql2 = "SELECT amount, user_id
+FROM savings 
+WHERE user_id = ?";
+
+$stmt = $mysqli -> prepare($sql2);
+$stmt -> bind_param("i", $user_id);
+$stmt -> execute();
+$stmt -> bind_result($amount, $fetched_user_id);
+$stmt -> fetch();
+$stmt -> close();
+
+$sql3 = "SELECT SUM(loan_amount) AS loan, user_id 
+FROM applications WHERE user_id = ?";
+
+$stmt = $mysqli -> prepare($sql3);
+$stmt -> bind_param("i", $user_id);
+$stmt -> execute();
+$stmt -> bind_result($loan, $fetched_user_id);
+$stmt -> fetch();
+$stmt -> close()
+
 ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -330,7 +353,127 @@ if($result -> num_rows > 0){
 
                 <!-- Members Dashboard -->
                 <?php elseif ($user_role == 'Member') : ?>
+                <div class="row">
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <a href="savings" style="text-decoration: none;">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Savings</span>
+                                                </div>
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                <?php echo "Ksh." . number_format(htmlspecialchars($amount), 2)?></div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-fw fa-piggy-bank fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <a href="Loans" style="text-decoration: none;">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Loan Balance</span>
+                                                </div>
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                <?php echo "Ksh." . number_format(htmlspecialchars($loan), 2)?></div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-landmark fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-4 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <a href="Contributions" style="text-decoration: none;">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                                <div class="info-box-content">
+                                                    <span class="info-box-text">Pending Contributions</span>
+                                                </div>
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                                <?php ?></div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-money-bill fa-2x text-gray-300"></i>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.col-md-6 -->
+                    <!-- Applications Breakdown Per Sub county -->
+                </div>
+
+                <div class="row">
+                   <div class="col-xl-6">
+                        <h4 style="color: #333; font-weight: bold;">📊 loan Repayment Over Time</h4>
+                            <div class="chart-container" width="500px" height="400px" margin="auto">
+                                <canvas id="loanRepaymentChart" width="500px" height="400px"></canvas>
+                            </div>
+
+                        <script>
+                            fetch('loanrepaymentchart.php') // Fetch JSON data from PHP file
+                            .then(response => response.json())
+                            .then(chartData => {
+                                const ctx = document.getElementById("loanRepaymentChart").getContext("2d");
+
+                                new Chart(ctx, {
+                                type: "line",
+                                data: {
+                                    labels: chartData.labels, // X-axis (dates)
+                                    datasets: [{
+                                        label: "Loan Repayment Progress",
+                                        data: chartData.data, // Y-axis (amount paid)
+                                        borderColor: "rgba(75, 192, 192, 1)",
+                                        backgroundColor: "rgba(75, 192, 192, 0.2)",
+                                        fill: true,
+                                        tension: 0.4
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        legend: { display: true }
+                                    },
+                                    scales: {
+                                        x: { title: { display: true, text: "Date" } },
+                                        y: { title: { display: true, text: "Amount Paid (KSH)" }, beginAtZero: true }
+                                    }
+                                }
+                                });
+                            })
+                            .catch(error => console.error("Error fetching chart data:", error));
+                        </script>
+                   </div>
+
+                   <div class="col-xl-6">
+                        <h4 style="color: #333; font-weight: bold;">Recent transactions</h4>
+                           
+
+                   </div>
+                </div>
                 <?php endif; ?>
             </div>
             <!-- /.row -->

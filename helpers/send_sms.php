@@ -2,7 +2,7 @@
 $username = "kavatafaith412@gmail.com";
 $apiKey   = "atsk_69d75902c4b635a1ddf1ab5c7342c07dddc4f5791f8ce05b559ccae99b9481739d6190d1";
 
-$recipients = "+254769586256"; // Replace with member phone numbers
+$recipients = "+254769586256"; 
 $message    = "Hello, this is an update from Chama Management System.";
 
 $url = "https://api.africastalking.com/version1/messaging";

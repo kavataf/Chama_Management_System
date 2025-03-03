@@ -11,7 +11,11 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // fetch
-$sql = "SELECT * FROM repayments ";
+$sql = "SELECT r.repayment_id, u.user_name, r.loan_name, r.loan_amount, r.loan_interest, 
+r.processing_fee, r.amount_paid, r.repayment_date
+          FROM repayments r
+          JOIN users u ON r.user_id = u.user_id
+          ORDER BY r.repayment_date DESC";
 $result = $mysqli -> query($sql);
 $repayments = array();
 if($result -> num_rows > 0){
@@ -56,12 +60,12 @@ if($result -> num_rows > 0){
                                                     <tr>
                                                         <th style="width: 10px">No</th>
                                                         <th>Member Name</th>
-                                                        <th>ID No</th>
                                                         <th>Loan Name</th>
                                                         <th>Loan Amount</th>
-                                                        <th>Loan Interest</th>
-                                                        <th>Processing Fee</th>
+                                                        <th style="width: 30px">Loan Interest</th>
+                                                        <th style="width: 30px">Processing Fee</th>
                                                         <th>Amount Paid</th>
+                                                        <th>Date</th>
                                                         <th>Manage</th>
                                                     </tr>
                                                 </thead>
@@ -70,9 +74,7 @@ if($result -> num_rows > 0){
                                                     <?php foreach ($repayments as $key => $repayment) : ?>
                                                     <tr>
                                                         <td><?php echo ($key + 1); ?></td>
-                                                        <td><?php echo htmlspecialchars($repayment['member_name']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($repayment['member_id_no']); ?>
+                                                        <td><?php echo htmlspecialchars($repayment['user_name']); ?>
                                                         </td>
                                                         <td><?php echo htmlspecialchars($repayment['loan_name']); ?>
                                                         </td>
@@ -83,6 +85,8 @@ if($result -> num_rows > 0){
                                                         <td><?php echo htmlspecialchars($repayment['processing_fee']); ?>
                                                         </td>
                                                         <td><?php echo htmlspecialchars($repayment['amount_paid']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($repayment['repayment_date']); ?>
                                                         </td>
 
                                                     </tr>

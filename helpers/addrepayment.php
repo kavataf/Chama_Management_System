@@ -2,8 +2,7 @@
 <?php 
 
 if(isset($_POST['loan_details'])){
-    $member_name = trim($_POST['member_name']);
-    $member_id_no = trim($_POST['member_id_no']);
+    $user_id = trim($_POST['user_id']);
     $loan_name = trim($_POST['loan_name']);
     $loan_amount = trim($_POST['loan_amount']);
     $loan_interest = trim($_POST['loan_interest']);
@@ -11,9 +10,9 @@ if(isset($_POST['loan_details'])){
     $amount_paid = trim($_POST['amount_paid']);
 
     // prepare
-    $stmt = $mysqli -> prepare("INSERT INTO repayments (member_name, member_id_no, loan_name, 
-    loan_amount, loan_interest, processing_fee, amount_paid) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt -> bind_param("sisiiii", $member_name, $member_id_no, $loan_name, $loan_amount, 
+    $stmt = $mysqli -> prepare("INSERT INTO repayments (user_id, loan_name, 
+    loan_amount, loan_interest, processing_fee, amount_paid) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt -> bind_param("isiiii", $user_id, $loan_name, $loan_amount, 
     $loan_interest, $processing_fee, $amount_paid);
 
     if ($stmt->execute()) {
