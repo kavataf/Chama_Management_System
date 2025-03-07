@@ -1,28 +1,52 @@
 <?php
-$username = "kavatafaith412@gmail.com";
-$apiKey   = "atsk_69d75902c4b635a1ddf1ab5c7342c07dddc4f5791f8ce05b559ccae99b9481739d6190d1";
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
+    // Retrieve form data
+    $recipientType = $_POST['recipient_type'];
+    $message = trim($_POST['message']);
 
-$recipients = "+254769586256"; 
-$message    = "Hello, this is an update from Chama Management System.";
+    // Africa's Talking credentials
+    $username = "sandbox";  
+    $apiKey = "atsk_2c6401ca0a934798f8ef906f6ad278d166a01112fa1d61a4a50e7defccdf058465ac7ed1"; 
+    $url = "https://api.sandbox.africastalking.com/version1/messaging";
 
-$url = "https://api.africastalking.com/version1/messaging";
-$data = array(
-    'username' => $username,
-    'to'       => $recipients,
-    'message'  => $message
-);
+    // Determine recipient(s)
+    if ($recipientType === "single") {
+        $phone = trim($_POST['phone']);
+        $recipients = $phone;
+    } else {
+        // Fetch all numbers from the database
+        $recipients = "+254711082000,+254722000111"; 
+    }
 
-$headers = array('apiKey: ' . $apiKey);
+    // Format request data
+    $postData = http_build_query([
+        'username' => $username,
+        'to' => $recipients,
+        'message' => $message
+    ]);
 
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, $url);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    $headers = [
+        "Accept: application/json",
+        "apiKey: $apiKey",
+        "Content-Type: application/x-www-form-urlencoded"
+    ];
 
-$response = curl_exec($ch);
-curl_close($ch);
+    // cURL request to Africa's Talking API
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-echo $response;
+    $response = curl_exec($ch);
+    
+    if (curl_errno($ch)) {
+        echo "cURL Error: " . curl_error($ch);
+    } else {
+        echo "Response: " . $response;
+    }
+
+    curl_close($ch);
+}
 ?>

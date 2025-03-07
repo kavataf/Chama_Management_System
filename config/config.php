@@ -31,3 +31,5 @@ $uri .= $_SERVER['HTTP_HOST'];
 /* Global directory */
 $base_dir = $uri . "/COMS/views/";
 global $base_dir;
+/* API key */
+define('AT_API_KEY', 'atsk_2c6401ca0a934798f8ef906f6ad278d166a01112fa1d61a4a50e7defccdf058465ac7ed1');

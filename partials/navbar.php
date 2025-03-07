@@ -7,10 +7,10 @@
     <!-- Sidebar - Brand -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="home">
         <div class="sidebar-brand-icon">
-            <img src="../public/img/small-logo.png" class="brand-image img-circle elevation-3"
-                style="opacity: .8; height: 30px;">
+            <img src="../public/img/chama_logo.png" class="brand-image img-circle elevation-3"
+                style="opacity: 1; height: 40px;">
         </div>
-        <div class="sidebar-brand-text mx-3">COMS</div>
+        <div class="sidebar-brand-text mx-2">COMS</div>
     </a>
 
     <!-- Divider -->
@@ -104,22 +104,12 @@
         
 
     <?php if ($user_role == 'System Administrator') echo '
-     <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages"
-                aria-expanded="true" aria-controls="collapsePages">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Reports</span>
-            </a>
-            <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="">Active Loans</a>
-                    <a class="collapse-item" href="">Closed Loans</a>
-                    <a class="collapse-item" href="">Loan Summary</a>
-                    <a class="collapse-item" href="">Savings reports</a>
-                    <a class="collapse-item" href="">Products reports</a>
-                </div>
-            </div>
-        </li>';
+    <li class="nav-item">
+        <a class="nav-link" href="reports">
+            <i class="fas fa-fw fa-chart-area"></i>
+            <span>Reports</span>
+        </a>
+    </li>';
     ?>
     <li class="nav-item">
         <a class="nav-link" href="products">
