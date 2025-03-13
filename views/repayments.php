@@ -107,7 +107,7 @@ if($result -> num_rows > 0){
                     </div>
 
                       <!-- loan repayments chart -->
-                <h3 style="color: #333; font-weight: bold;">🏦 Monthly Loan Repayments</h3>
+                <!-- <h3 style="color: #333; font-weight: bold;">🏦 Monthly Loan Repayments</h3>
                 <div style="width: 80%; margin: auto;">
                     <canvas id="loanRepaymentsChart"></canvas>
                 </div>
@@ -141,7 +141,7 @@ if($result -> num_rows > 0){
                             }
                         }
                     });
-                </script>
+                </script> -->
 
 
                 <?php endif; ?>

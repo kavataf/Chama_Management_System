@@ -23,6 +23,21 @@ if($result -> num_rows > 0){
     }
 }
 
+$user_id = $_SESSION['user_id'];
+// fetch member savings
+$sql = "SELECT s.savings_id, u.user_name, s.reference_no, s.amount, s.savings_date, s.payment_method 
+          FROM savings s
+          JOIN users u ON s.user_id = u.user_id
+          WHERE s.user_id = $user_id
+          ORDER BY s.savings_date DESC";
+$result = $mysqli -> query($sql);
+$member_savings = array();
+if($result -> num_rows > 0){
+    while($row = $result -> fetch_assoc()){
+       $member_savings[] = $row;
+    }
+}
+
 ?>
 
 <body id="page-top">
@@ -117,7 +132,7 @@ if($result -> num_rows > 0){
 
                          
                 <!-- total savings vs withdrawals chart -->
-                <h3 style="color: #333; font-weight: bold;">🏦 Total Savings vs. Withdrawals</h3>
+                <!-- <h3 style="color: #333; font-weight: bold;">🏦 Total Savings vs. Withdrawals</h3>
                 <div style="width: 80%; margin: auto;">
                     <canvas id="savingsWithdrawalsChart"></canvas>
                 </div>
@@ -173,8 +188,63 @@ if($result -> num_rows > 0){
                     // Render the chart
                     const ctx = document.getElementById('savingsWithdrawalsChart').getContext('2d');
                     const savingsWithdrawalsChart = new Chart(ctx, config);
-                </script>
+                </script> -->
 
+
+                <?php elseif ($user_role == 'Member') : ?>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="card card-yellow card-outline">
+                                <div class="card-header">
+                                    <div class="d-sm-flex align-items-center justify-content-between mb-0">
+                                        <h5 class="card-title m-0">Savings</h5>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-lg-12 table-responsive">
+                                            <!-- table -->
+                                            <table class="table table-bordered" id="datatable">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 10px">No</th>
+                                                        <th>Member Name</th>
+                                                        <th>Ref. No</th>
+                                                        <th>Amount</th>
+                                                        <th>Date</th>
+                                                        <th>Payment Method</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php if (!empty($member_savings)) : ?>
+                                                    <?php foreach ($member_savings as $key => $member_saving) : ?>
+                                                    <tr>
+                                                        <td><?php echo ($key + 1); ?></td>
+                                                        <td><?php echo htmlspecialchars($member_saving['user_name']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($member_saving['reference_no']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($member_saving['amount']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($member_saving['savings_date']); ?>
+                                                        </td>
+                                                        <td><?php echo htmlspecialchars($member_saving['payment_method']); ?>
+                                                        </td>
+                                                    </tr>
+                                                    <?php endforeach; ?>
+                                                    <?php else : ?>
+                                                    <tr>
+                                                        <td colspan="8">No records found</td>
+                                                    </tr>
+                                                    <?php endif; ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 <?php endif; ?>
             </div>
