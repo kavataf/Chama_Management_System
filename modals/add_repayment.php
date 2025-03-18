@@ -62,6 +62,11 @@ $result = $mysqli->query($query);
                                 <input type="amount" placeholder="123xxxxx" required name="amount_paid"
                                     class="form-control">
                             </div>
+                            <div class="form-group col-md-6">
+                                <label for="">Date<span class="text-danger">*</span></label>
+                                <input type="date" placeholder="" required name="repayment_date"
+                                    class="form-control">
+                            </div>
                         </div> 
                     </fieldset>
                     <div class="modal-footer">

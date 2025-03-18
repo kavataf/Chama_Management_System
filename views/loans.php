@@ -13,10 +13,16 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch loan details
-$sql = "SELECT user_id, loan_amount, loan_status, application_date
-        FROM applications 
-        WHERE user_id = ? 
-        ORDER BY application_date DESC";
+$sql = "SELECT a.user_id, a.loan_name, a.loan_status, a.loan_purpose, a.loan_amount, a.loan_duration,
+       IFNULL(p.loan_interest, 0) AS interest,
+       IFNULL(p.processing_fee, 0) AS processing_fee,
+       IFNULL(p.loan_penalty, 0) AS penalty,
+       (a.loan_amount + (a.loan_amount * p.loan_interest / 100) + p.processing_fee + IFNULL(p.loan_penalty, 0)) AS total_to_repay,
+       a.application_date
+FROM applications a
+LEFT JOIN products p ON a.loan_id = p.loan_id
+WHERE a.user_id = ? 
+ORDER BY application_date DESC";
 
 $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("i", $user_id);
@@ -31,7 +37,7 @@ if ($result->num_rows > 0) {
 }
 
 // fetch repayments
-$sql = "SELECT amount_paid, repayment_date FROM repayments WHERE loan_id = ?";
+$sql = "SELECT loan_name, amount_paid, repayment_date FROM repayments WHERE user_id = ?";
 $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -39,6 +45,28 @@ $result = $stmt->get_result();
 $repayments = array();
 while ($row = $result->fetch_assoc()) {
     $repayments[] = $row;
+}
+
+// calculate total repayment amount
+$totals = array();
+$sql = "SELECT a.loan_name, a.loan_status, a.loan_purpose, a.loan_amount, a.loan_duration,
+       IFNULL(p.loan_interest, 0) AS interest,
+       IFNULL(p.processing_fee, 0) AS processing_fee,
+       IFNULL(p.loan_penalty, 0) AS penalty,
+       (a.loan_amount + (a.loan_amount * p.loan_interest / 100) + p.processing_fee + IFNULL(p.loan_penalty, 0)) AS total_to_repay
+FROM applications a
+LEFT JOIN products p ON a.loan_id = p.loan_id
+WHERE a.user_id = ?";
+
+$stmt = $mysqli->prepare($sql);
+$stmt->bind_param('i', $user_id);
+$stmt->execute();
+
+$result = $stmt->get_result();
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $totals[] = $row;
+    }
 }
 
 ?>
@@ -167,7 +195,9 @@ while ($row = $result->fetch_assoc()) {
                                 <thead>
                                     <tr>
                                         <th>Loan ID</th>
+                                        <th>Loan Name</th>
                                         <th>Amount</th>
+                                        <th>Amount to repay</th>
                                         <th>Status</th>
                                         <th>Application Date</th>
                                     </tr>
@@ -177,7 +207,9 @@ while ($row = $result->fetch_assoc()) {
                                 <?php foreach ($loans as $loan) : ?>
                                     <tr>
                                         <td><?php echo $loan['user_id']; ?></td>
+                                        <td><?php echo $loan['loan_name']; ?></td>
                                         <td><?php echo number_format($loan['loan_amount'], 2); ?></td>
+                                        <td><?php echo number_format($loan['total_to_repay'], 2); ?></td>
                                         <td><?php echo $loan['loan_status']; ?></td>
                                         <td><?php echo date("d M Y", strtotime($loan['application_date'])); ?></td>
                                     </tr>
@@ -198,6 +230,7 @@ while ($row = $result->fetch_assoc()) {
                             <table id="datatable" class="table table-striped table-bordered">
                                 <thead>
                                     <tr>
+                                        <th>Loan Name</th>
                                         <th>Amount Paid</th>
                                         <th>Payment Date</th>
                                     </tr>
@@ -206,8 +239,9 @@ while ($row = $result->fetch_assoc()) {
                                 <?php if (!empty($repayments)) : ?>
                                 <?php foreach ($repayments as $repayment) : ?>
                                 <tr>
+                                    <td><?php echo $repayment['loan_name']; ?></td>
                                     <td><?php echo number_format($repayment['amount_paid'], 2); ?></td>
-                                    <td><?php echo date("d M Y", strtotime($repayment['payment_date'])); ?></td>
+                                    <td><?php echo date("d M Y", strtotime($repayment['repayment_date'])); ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                                 <?php else : ?>

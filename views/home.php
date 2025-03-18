@@ -389,7 +389,7 @@ $stmt -> close()
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo "Ksh." . number_format(htmlspecialchars($loan), 2)?></div>
+                                                <?php ?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-landmark fa-2x text-gray-300"></i>

@@ -18,62 +18,69 @@ require_once('../helpers/addproduct.php');
                     <!-- product Information -->
                     <fieldset class="border p-2 border-success">
                         <legend class="w-auto text-success">Product Details</legend>
+
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="">Loan Name<span class="text-danger">*</span></label>
-                                <input type="text" placeholder="enter loan" required name="loan_name" class="form-control">
+                                <label for="loan_id">Loan ID<span class="text-danger">*</span></label>
+                                <input type="text" name="loan_id" required class="form-control" placeholder="Enter Loan ID">
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="">Loan Interest<span class="text-danger">*</span></label>
-                                <input type="text" placeholder="" required name="loan_interest"
-                                    class="form-control">
+                                <label for="loan_name">Loan Name<span class="text-danger">*</span></label>
+                                <input type="text" placeholder="Enter Loan Name" required name="loan_name" class="form-control">
                             </div>
                         </div>
+                        
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="">Loan Duration<span class="text-danger">*</span></label>
-                                <input type="text" required name="loan_duration" class="form-control">
+                                <label for="loan_interest">Loan Interest (%)<span class="text-danger">*</span></label>
+                                <input type="number" step="0.01" required name="loan_interest" class="form-control">
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="">Processing Fee<span class="text-danger">*</span></label>
-                                <input type="text" placeholder="" required name="processing_fee"
-                                    class="form-control">
+                                <label for="loan_duration">Loan Duration (Months)<span class="text-danger">*</span></label>
+                                <input type="number" required name="loan_duration" class="form-control">
                             </div>
                         </div>
+
                         <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="">Maximum Limit<span class="text-danger">*</span></label>
-                                <input type="text" required name="maximum_limit" class="form-control">
+                                <label for="processing_fee">Processing Fee<span class="text-danger">*</span></label>
+                                <input type="number" required name="processing_fee" class="form-control">
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="">Loan Guarantors<span class="text-danger">*</span></label>
+                                <label for="maximum_limit">Maximum Limit<span class="text-danger">*</span></label>
+                                <input type="number" required name="maximum_limit" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="loan_guarantors">Loan Guarantors<span class="text-danger">*</span></label>
                                 <select required name="loan_guarantors" class="form-control">
                                     <option value="">Select</option>
                                     <option value="Yes">Yes</option>
                                     <option value="No">No</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="form-row">
                             <div class="form-group col-md-6">
-                                <label for="">Member Savings<span class="text-danger">*</span></label>
-                                <input type="text" required name="member_savings" class="form-control">
+                                <label for="member_savings">Member Savings<span class="text-danger">*</span></label>
+                                <input type="number" required name="member_savings" class="form-control">
                             </div>
+                        </div>
+
+                        <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="thumbnail">Thumbnail <span class="text-danger">*</span></label>
                                 <input type="file" name="thumbnail" class="form-control" required>
                             </div>
+                            <div class="form-group col-md-6">
+                                <label for="loan_penalty">Loan Penalty<span class="text-danger">*</span></label>
+                                <input type="number" required name="loan_penalty" class="form-control">
+                            </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="">Loan Penalty<span class="text-danger">*</span></label>
-                                <input type="text" required name="loan_penalty" class="form-control">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="">Loan Description<span class="text-danger">*</span></label>
-                                <input type="text" placeholder="" required name="loan_description"
-                                    class="form-control">
-                            </div>
+
+                        <div class="form-group">
+                            <label for="loan_description">Loan Description<span class="text-danger">*</span></label>
+                            <textarea name="loan_description" required class="form-control" rows="3"></textarea>
                         </div>
                     </fieldset>
                     <div class="modal-footer">

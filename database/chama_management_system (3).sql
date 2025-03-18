@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 13, 2025 at 08:50 AM
+-- Generation Time: Mar 17, 2025 at 03:16 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -107,6 +107,7 @@ INSERT INTO `members` (`user_id`, `member_name`, `member_gender`, `member_id_no`
 
 CREATE TABLE `products` (
   `product_id` int(200) NOT NULL,
+  `loan_id` int(11) NOT NULL,
   `loan_name` varchar(200) NOT NULL,
   `loan_interest` int(200) NOT NULL,
   `loan_duration` varchar(200) NOT NULL,
@@ -119,13 +120,6 @@ CREATE TABLE `products` (
   `loan_description` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `products`
---
-
-INSERT INTO `products` (`product_id`, `loan_name`, `loan_interest`, `loan_duration`, `processing_fee`, `maximum_limit`, `loan_guarantors`, `member_savings`, `thumbnail`, `loan_penalty`, `loan_description`) VALUES
-(1, 'Business Capital', 5000, '8', 800, 200000, 'Yes', 30000, 'uploads/payment receipt.jpg', 10000, 'Capital to start business');
-
 -- --------------------------------------------------------
 
 --
@@ -135,7 +129,7 @@ INSERT INTO `products` (`product_id`, `loan_name`, `loan_interest`, `loan_durati
 CREATE TABLE `repayments` (
   `repayment_id` int(200) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `member_id_no` int(200) NOT NULL,
+  `loan_id` int(11) NOT NULL,
   `loan_name` varchar(200) NOT NULL,
   `loan_amount` int(200) NOT NULL,
   `loan_interest` int(200) NOT NULL,
@@ -143,15 +137,6 @@ CREATE TABLE `repayments` (
   `amount_paid` int(200) NOT NULL,
   `repayment_date` varchar(200) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `repayments`
---
-
-INSERT INTO `repayments` (`repayment_id`, `user_id`, `member_id_no`, `loan_name`, `loan_amount`, `loan_interest`, `processing_fee`, `amount_paid`, `repayment_date`) VALUES
-(1, 11, 0, 'Business Capital', 200000, 2000, 800, 25000, '2024-12-12'),
-(2, 11, 0, 'Business Capital', 200000, 2000, 800, 10000, '2025-01-12'),
-(3, 11, 0, 'Business Capital', 200000, 2000, 800, 15000, '2025-02-12');
 
 -- --------------------------------------------------------
 
@@ -239,14 +224,16 @@ ALTER TABLE `members`
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
-  ADD PRIMARY KEY (`product_id`);
+  ADD PRIMARY KEY (`product_id`),
+  ADD KEY `loan_id` (`loan_id`);
 
 --
 -- Indexes for table `repayments`
 --
 ALTER TABLE `repayments`
   ADD PRIMARY KEY (`repayment_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `loan_id` (`loan_id`);
 
 --
 -- Indexes for table `savings`
@@ -293,13 +280,13 @@ ALTER TABLE `members`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `product_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `repayments`
 --
 ALTER TABLE `repayments`
-  MODIFY `repayment_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `repayment_id` int(200) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `savings`
@@ -324,10 +311,17 @@ ALTER TABLE `applications`
   ADD CONSTRAINT `applications_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 
 --
+-- Constraints for table `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`loan_id`) REFERENCES `applications` (`application_id`);
+
+--
 -- Constraints for table `repayments`
 --
 ALTER TABLE `repayments`
-  ADD CONSTRAINT `repayments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+  ADD CONSTRAINT `repayments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `repayments_ibfk_2` FOREIGN KEY (`loan_id`) REFERENCES `applications` (`application_id`);
 
 --
 -- Constraints for table `savings`

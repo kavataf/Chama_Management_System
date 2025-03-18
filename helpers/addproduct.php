@@ -2,6 +2,7 @@
 <?php 
 
 if(isset($_POST['product_details'])){
+    $loan_id = trim($_POST['loan_id']);
     $loan_name = trim($_POST['loan_name']);
     $loan_interest = trim($_POST['loan_interest']);
     $loan_duration = trim($_POST['loan_duration']);
@@ -30,9 +31,9 @@ if(isset($_POST['product_details'])){
    }
 
     // prepare
-    $stmt = $mysqli -> prepare("INSERT INTO products (loan_name, loan_interest, loan_duration, processing_fee,
-    maximum_limit, loan_guarantors, member_savings, thumbnail, loan_penalty, loan_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt -> bind_param("sisiisisis", $loan_name, $loan_interest, $loan_duration, $processing_fee, $maximum_limit, $loan_guarantors, 
+    $stmt = $mysqli -> prepare("INSERT INTO products (loan_id, loan_name, loan_interest, loan_duration, processing_fee,
+    maximum_limit, loan_guarantors, member_savings, thumbnail, loan_penalty, loan_description) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt -> bind_param("ssisiisisis", $loan_id, $loan_name, $loan_interest, $loan_duration, $processing_fee, $maximum_limit, $loan_guarantors, 
     $member_savings, $thumbnail, $loan_penalty, $loan_description);
 
     if ($stmt->execute()) {
