@@ -21,7 +21,7 @@ if($result -> num_rows > 0){
 
 $user_id = $_SESSION['user_id'];
 
-$sql2 = "SELECT amount, user_id
+$sql2 = "SELECT SUM(amount) AS amount, user_id
 FROM savings 
 WHERE user_id = ?";
 
@@ -389,7 +389,7 @@ $stmt -> close()
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php ?></div>
+                                                <?php echo "Ksh." . number_format(htmlspecialchars($loan), 2)?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-landmark fa-2x text-gray-300"></i>

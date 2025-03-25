@@ -32,14 +32,12 @@
         Manage
     </div>
 
-     <?php if ( $user_role == 'System Administrator') echo '
     <li class="nav-item">
         <a class="nav-link" href="contributions">
             <i class="fas fa-fw fa-money-bill"></i>
             <span>Contributions</span>
         </a>
-    </li>';
-    ?> 
+    </li>
 
     <?php
 

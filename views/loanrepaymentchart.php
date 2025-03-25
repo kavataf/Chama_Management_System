@@ -12,8 +12,11 @@ if (!isset($_SESSION['user_id'])) {
 
 // member loanRepaymentChart
 $user_id = $_SESSION['user_id'];
-$loanRepaymentChart = "SELECT user_id, SUM(amount_paid) AS amount, repayment_date
-FROM repayments WHERE user_id = ? GROUP BY repayment_date ORDER BY repayment_date ASC";
+$loanRepaymentChart = "SELECT user_id, repayment_date, SUM(amount_paid) AS total_amount
+FROM repayments 
+WHERE user_id = ? 
+GROUP BY repayment_date 
+ORDER BY repayment_date ASC;";
 
 $stmt = $mysqli -> prepare($loanRepaymentChart);
 $stmt -> bind_param("i", $user_id);
@@ -25,7 +28,7 @@ $data = [];
 
 while($row = $result -> fetch_assoc()){
     $labels[] = $row['repayment_date'];
-    $data[] = $row['amount'];
+    $data[] = $row['total_amount'];
 }
 
 $stmt -> close();
