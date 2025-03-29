@@ -40,7 +40,36 @@ $stmt -> bind_param("i", $user_id);
 $stmt -> execute();
 $stmt -> bind_result($loan, $fetched_user_id);
 $stmt -> fetch();
-$stmt -> close()
+$stmt -> close();
+
+$sql4 = "SELECT COUNT(*) AS loan_applications FROM applications";
+
+$result = $mysqli -> query($sql4);
+if($result -> num_rows > 0){
+    while($row = $result -> fetch_assoc()){
+        $loans = $row['loan_applications'];
+    }
+}
+
+$sql5 = "SELECT COUNT(*) AS contributions FROM contributions";
+
+$result = $mysqli -> query($sql5);
+if($result -> num_rows > 0){
+    while($row = $result -> fetch_assoc()){
+        $contributions = $row['contributions'];
+    }
+}
+
+$unpaid_query = mysqli_query($mysqli, 
+    "SELECT COUNT(*) AS unpaid_count 
+    FROM contributions c 
+    LEFT JOIN member_contributions mc 
+    ON c.contribution_id = mc.contribution_id AND mc.member_id = $user_id 
+    WHERE mc.status IS NULL OR mc.status != 'paid'"
+);
+
+$unpaid_result = mysqli_fetch_assoc($unpaid_query);
+
 
 ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -87,7 +116,7 @@ $stmt -> close()
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php  echo htmlspecialchars($total_members)?></div>
+                                                <?php echo htmlspecialchars($total_members)?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-user-check fa-2x text-gray-300"></i>
@@ -101,7 +130,7 @@ $stmt -> close()
                     <div class="col-xl-4 col-md-6 mb-4">
                         <div class="card border-left-primary shadow h-100 py-2">
                             <div class="card-body">
-                                <a href="Loans" style="text-decoration: none;">
+                                <a href="applications" style="text-decoration: none;">
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
@@ -110,7 +139,7 @@ $stmt -> close()
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php ?></div>
+                                                <?php echo htmlspecialchars($loans)?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-landmark fa-2x text-gray-300"></i>
@@ -133,7 +162,7 @@ $stmt -> close()
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php ?></div>
+                                                <?php echo htmlspecialchars($contributions)?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-money-bill fa-2x text-gray-300"></i>
@@ -149,13 +178,12 @@ $stmt -> close()
                 <div class="row">
                     <div class="col-xl-6">
                         <!-- member growth chart -->
-                        <h3 style="color: #333; font-weight: bold;">📊 Member Growth Over Time</h3>
-                        <div class="chart-container" width="300px" height="400px">
-                            <canvas id="memberGrowthChart" width="100%" height="400px"></canvas>
+                        <h4 style="color: #333; font-weight: bold;" class="mt-4">📊 Member Growth Over Time</h4>
+                        <div class="chart-container" width="300px" height="300px">
+                            <canvas id="memberGrowthChart" width="100%" height="100%"></canvas>
                         </div>
 
-                        <!-- <script>
-                            // Fetch member growth data from PHP
+                        <script>
                             fetch('fetch_member_growth.php')
                                 .then(response => response.json())
                                 .then(data => {
@@ -164,10 +192,10 @@ $stmt -> close()
                                     new Chart(ctx, {
                                         type: 'line',
                                         data: {
-                                            labels: data.labels, // Months/Years
+                                            labels: data.labels, 
                                             datasets: [{
                                                 label: 'Total Members',
-                                                data: data.values, // Total members count
+                                                data: data.values, 
                                                 borderColor: 'blue',
                                                 backgroundColor: 'rgba(0, 0, 255, 0.1)',
                                                 borderWidth: 2,
@@ -185,171 +213,39 @@ $stmt -> close()
                                     });
                                 })
                                 .catch(error => console.error('Error fetching data:', error));
-                        </script> -->
-
-
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function () {
-                                const ctx = document.getElementById('memberGrowthChart').getContext('2d');
-
-                                // Sample data (replace this with data from your database)
-                                const labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-                                const membersData = [20, 45, 60, 80, 95, 120, 150, 190, 220, 250, 280, 320];
-
-                                new Chart(ctx, {
-                                    type: 'line',
-                                    data: {
-                                        labels: labels,
-                                        datasets: [{
-                                            label: 'Total Members',
-                                            data: membersData,
-                                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                            borderColor: 'rgba(54, 162, 235, 1)',
-                                            borderWidth: 2,
-                                            pointBackgroundColor: 'rgba(255, 99, 132, 1)',
-                                            pointRadius: 5,
-                                            tension: 0.3 // Smooth curve effect
-                                        }]
-                                    },
-                                    options: {
-                                        responsive: true,
-                                        maintainAspectRatio: false,
-                                        plugins: {
-                                            legend: {
-                                                display: true,
-                                                labels: {
-                                                    color: '#333',
-                                                    font: {
-                                                        size: 14
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        scales: {
-                                            x: {
-                                                grid: {
-                                                    display: false
-                                                }
-                                            },
-                                            y: {
-                                                beginAtZero: true,
-                                                grid: {
-                                                    color: 'rgba(200, 200, 200, 0.2)'
-                                                }
-                                            }
-                                        }
-                                    }
-                                });
-                            });
                         </script>
+
                     </div>
                     <div class="col-xl-6">
                         <!-- loan distribution chart -->
-                        <h3 style="color: #333; font-weight: bold;">🏦 Loan Distribution Percentages</h3>
+                        <h4 style="color: #333; font-weight: bold;" class="mt-4">🏦 Loan Distribution Percentages</h4>
                             
                             <div class="chart-container" width = "400px" height = "400px">
                                 <canvas id="loanDistributionChart" width = "400px" height = "400px"></canvas>
                             </div>
 
                             <script>
-                                document.addEventListener("DOMContentLoaded", function () {
-                                    const ctx = document.getElementById('loanDistributionChart').getContext('2d');
+                                fetch('loan_distribution.php') 
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        const ctx = document.getElementById('loanDistributionChart').getContext('2d');
 
-                                    // Sample Data (Replace with real database values)
-                                    const loanTypes = ["Personal Loan", "Business Loan", "Education Loan", "Emergency Loan"];
-                                    const loanAmounts = [40, 25, 20, 15]; // Percentages of total loans
-
-                                    new Chart(ctx, {
-                                        type: 'pie',
-                                        data: {
-                                            labels: loanTypes,
-                                            datasets: [{
-                                                label: 'Loan Distribution (%)',
-                                                data: loanAmounts,
-                                                backgroundColor: [
-                                                    'rgba(54, 162, 235, 0.7)',  // Blue
-                                                    'rgba(255, 99, 132, 0.7)',  // Red
-                                                    'rgba(255, 206, 86, 0.7)',  // Yellow
-                                                    'rgba(75, 192, 192, 0.7)'   // Green
-                                                ],
-                                                borderColor: [
-                                                    'rgba(54, 162, 235, 1)',
-                                                    'rgba(255, 99, 132, 1)',
-                                                    'rgba(255, 206, 86, 1)',
-                                                    'rgba(75, 192, 192, 1)'
-                                                ],
-                                                borderWidth: 1
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: false, 
-                                            maintainAspectRatio: false,
-                                            plugins: {
-                                                legend: {
-                                                    position: 'bottom',
-                                                    labels: {
-                                                        color: '#333',
-                                                        font: {
-                                                            size: 14
-                                                        }
-                                                    }
-                                                }
+                                        new Chart(ctx, {
+                                            type: 'pie',
+                                            data: {
+                                                labels: ['Approved Loans', 'Savings', 'Repayments'],
+                                                datasets: [{
+                                                    label: 'Loan Distribution',
+                                                    data: [data.approved_loans, data.savings, data.repayments],
+                                                    backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+                                                }]
                                             }
-                                        }
-                                    });
-                                });
+                                        });
+                                    })
+                                    .catch(error => console.error('Error fetching data:', error));
                             </script>
                     </div>
               </div>
-              <div style="width: 80%; margin: 0 auto;">
-                    <canvas id="defaultersChart"></canvas>
-              </div>
-
-                <script>
-                    // PHP variables injected into JavaScript
-                    var memberNames = <?php echo json_encode($member_names); ?>;
-                    var overdueAmounts = <?php echo json_encode($overdue_amounts); ?>;
-
-                    var ctx = document.getElementById('defaultersChart').getContext('2d');
-                    var defaultersChart = new Chart(ctx, {
-                        type: 'bar',  // Chart type (Bar Chart)
-                        data: {
-                            labels: memberNames,  // X-axis labels (Member Names)
-                            datasets: [{
-                                label: 'Overdue Amounts',
-                                data: overdueAmounts,  // Y-axis data (Overdue Amounts)
-                                backgroundColor: 'rgba(255, 99, 132, 0.2)', // Bar color
-                                borderColor: 'rgba(255, 99, 132, 1)', // Border color
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            return '₦' + value; // Format numbers as currency
-                                        }
-                                    }
-                                }
-                            },
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    display: false  // Hides the legend
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(tooltipItem) {
-                                            return '₦' + tooltipItem.raw; // Display currency in tooltip
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    });
-                </script>
 
                 <!-- Members Dashboard -->
                 <?php elseif ($user_role == 'Member') : ?>
@@ -412,7 +308,7 @@ $stmt -> close()
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php ?></div>
+                                                <?php echo $unpaid_result['unpaid_count']?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-money-bill fa-2x text-gray-300"></i>
@@ -427,14 +323,14 @@ $stmt -> close()
                 </div>
 
                 <div class="row">
-                   <div class="col-xl-6">
+                   <div class="col-xl-6 mt-4">
                         <h4 style="color: #333; font-weight: bold;">📊 loan Repayment Over Time</h4>
                             <div class="chart-container" width="500px" height="400px" margin="auto">
                                 <canvas id="loanRepaymentChart" width="500px" height="400px"></canvas>
                             </div>
 
                         <script>
-                            fetch('loanrepaymentchart.php') // Fetch JSON data from PHP file
+                            fetch('loanrepaymentchart.php') 
                             .then(response => response.json())
                             .then(chartData => {
                                 const ctx = document.getElementById("loanRepaymentChart").getContext("2d");
@@ -442,10 +338,10 @@ $stmt -> close()
                                 new Chart(ctx, {
                                 type: "line",
                                 data: {
-                                    labels: chartData.labels, // X-axis (dates)
+                                    labels: chartData.labels, 
                                     datasets: [{
                                         label: "Loan Repayment Progress",
-                                        data: chartData.data, // Y-axis (amount paid)
+                                        data: chartData.data, 
                                         borderColor: "rgba(75, 192, 192, 1)",
                                         backgroundColor: "rgba(75, 192, 192, 0.2)",
                                         fill: true,
@@ -469,8 +365,45 @@ $stmt -> close()
                    </div>
 
                    <div class="col-xl-6">
-                        <h4 style="color: #333; font-weight: bold;">Recent transactions</h4>
-                           
+                        <div class="container mt-4">
+                            <h4 style="color: #333; font-weight: bold;">Recent transactions</h4>
+                            <div id="transactions-list"></div>
+                        </div>
+                        <script>
+                            $(document).ready(function () {
+                                fetch('recent_transactions.php')
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        let transactionsHTML = "";
+
+                                        if (data.length === 0) {
+                                            transactionsHTML = "<p>No recent transactions.</p>";
+                                        } else {
+                                            data.forEach(transaction => {
+                                                let badgeClass = transaction.status.toLowerCase() === 'paid' ? 'bg-success' : 'bg-warning';
+
+                                                transactionsHTML += `
+                                                    <div class="card mb-3 shadow-sm">
+                                                        <div class="card-body">
+                                                            <h5 class="card-title">${transaction.title}</h5>
+                                                            <p class="card-text">
+                                                                <strong>Due Date:</strong> ${transaction.due_date} <br>
+                                                                <strong>Amount Paid:</strong> $${transaction.amount_paid} <br>
+                                                                <strong>Status:</strong> 
+                                                                <span class="badge ${badgeClass}">${transaction.status}</span> <br>
+                                                                <strong>Payment Date:</strong> ${new Date(transaction.payment_date).toLocaleString()}
+                                                            </p>
+                                                        </div>
+                                                    </div>`;
+                                            });
+                                        }
+
+                                        $('#transactions-list').html(transactionsHTML);
+                                    })
+                                    .catch(error => console.error('Error fetching transactions:', error));
+                            });
+
+                        </script>
 
                    </div>
                 </div>

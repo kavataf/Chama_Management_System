@@ -14,8 +14,8 @@ $sql = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS total
 $result = $mysqli->query($sql);
 
 while ($row = $result->fetch_assoc()) {
-    $labels[] = $row['month']; // Months (X-axis)
-    $values[] = $row['total']; // Total members (Y-axis)
+    $labels[] = $row['month'];
+    $values[] = $row['total']; 
 }
 
 // Return JSON response

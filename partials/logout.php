@@ -4,7 +4,7 @@
         <div class="modal-content">
             <form method="POST" action="../helpers/logout">
                 <div class="modal-body text-center text-dark">
-                    <img src="../public/img/small-logo.png" height="80px"><br>
+                    <img src="../public/img/chama_logo.png" height="80px"><br>
                     <h4>Leaving so soon</h4>
                     <p>Have you finished exploring the system?</p>
                     <button type="button" class="text-center btn btn-success" data-dismiss="modal" style="background-color: #129139;">No, I'm still
