@@ -19,6 +19,7 @@ if (isset($_POST['Login'])) {
             $_SESSION['user_name'] = $row['user_name'];
             $_SESSION['user_access_level'] = $row['user_access_level'];
             $_SESSION['success'] = 'Login successful';
+            $success = 'Login successful';
             header('Location: home');
             exit;
         } else {
@@ -50,7 +51,7 @@ if(empty($user_name) || empty($user_email) || empty($user_password) || empty($co
     $stmt = $mysqli -> prepare("INSERT INTO users (user_name, user_email, user_password) VALUES (?, ?, ?)");
     $stmt -> bind_param('sss', $user_name, $user_email, $user_password);
     if($stmt -> execute()){
-        $_SESSION['success'] = "successful signup, please login";
+        $success = "successful signup, please login";
         header("location: login.php");
         exit;
     } else {
