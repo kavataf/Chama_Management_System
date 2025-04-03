@@ -82,6 +82,12 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                                         <span class="text">View Contribution</span>
                                     </a>
                                 </div>
+                                
+                                <div class="col-xl-4 col-md-4 mb-4">
+                                    <form method="post" action="notifications.php">
+                                        <button class="btn btn-primary" type="submit" name="send_notifications">Send Contribution Notifications</button>
+                                    </form>
+                                </div>
                             </div>
 
                         <div class="container mt-4">

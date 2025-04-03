@@ -62,12 +62,24 @@
                         <span
                             class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
                             <?php if ($user_role == 'Member') echo '
-                                <span>
-                                  <i class="fas fa-bell fa-md fa-fw mr-2 text-primary"></i>
-                                </span>';
+                            <div class="notification-icon position-relative" onclick="showNotifications()">
+                                <span>🛎</span>
+                                <span id="notification-count" class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-circle"></span>
+                            </div>
+
+                            <div id="notification-dropdown" 
+                            style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 999;">
+                                <ul id="notification-list"></ul>
+                            </div>
+                            
+                            <div class="ml-3">
+                              <img class="img-profile rounded-circle" src="../public/img/no-profile.png">
+                            </div>';
                             ?>
-                        
-                            <img class="img-profile rounded-circle" src="../public/img/no-profile.png">
+
+                            <?php if ($user_role == 'System Administrator') echo '
+                              <img class="img-profile rounded-circle" src="../public/img/no-profile.png">';
+                              ?>
                     </a>
                     <!-- Dropdown - User Information -->
                     <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -93,3 +105,65 @@
             </ul>
 
         </nav>
+ 
+<?php require_once('../partials/scripts.php'); ?>
+<?php require_once('../customs/scripts/functions.php'); ?>
+<?php require_once('../customs/scripts/ajax.php'); ?>
+
+<script>
+    function showNotifications() {
+    let dropdown = document.getElementById("notification-dropdown");
+    
+    // Toggle visibility
+    if (dropdown.style.display === "block") {
+        dropdown.style.display = "none";
+        return;
+    }
+
+    // Fetch notifications
+    fetch('fetch_notifications.php')
+        .then(response => response.json())
+        .then(data => {
+            let notificationList = document.getElementById("notification-list");
+            notificationList.innerHTML = ""; 
+            
+            if (data.length === 0) {
+                notificationList.innerHTML = "<li>No new notifications</li>";
+            } else {
+                data.forEach(notification => {
+                    let li = document.createElement("li");
+                    li.textContent = notification.message;
+                    notificationList.appendChild(li);
+                });
+            }
+            dropdown.style.display = "block"; 
+            dropdown.style.position = "absolute";
+            dropdown.style.top = "60px"; 
+            dropdown.style.right = "0";
+            dropdown.style.width = "200px";
+            dropdown.style.backgroundColor = "white";
+            dropdown.style.border = "1px solid #ccc";
+            dropdown.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
+            dropdown.style.maxHeight = "400px"; 
+            dropdown.style.overflowY = "auto"; 
+            dropdown.style.padding = "10px";
+            dropdown.style.zIndex = "9999";
+        })
+        .catch(error => console.error("Error fetching notifications:", error));
+}
+
+function updateNotificationCount() {
+    fetch('fetch_notifications.php')
+        .then(response => response.json())
+        .then(data => {
+            let countElement = document.getElementById("notification-count");
+            let count = data.length;
+            countElement.textContent = count > 0 ? count : "";
+        });
+}
+
+// Update count every 30 seconds
+setInterval(updateNotificationCount, 30000);
+updateNotificationCount();
+
+</script>
