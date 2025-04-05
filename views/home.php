@@ -262,7 +262,7 @@ $unpaid_result = mysqli_fetch_assoc($unpaid_query);
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo "Ksh." . number_format(htmlspecialchars($amount), 2)?></div>
+                                                <?php echo "Ksh." . (is_numeric($amount) ? number_format((float)$amount, 2) : "0.00")?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-fw fa-piggy-bank fa-2x text-gray-300"></i>
@@ -285,7 +285,7 @@ $unpaid_result = mysqli_fetch_assoc($unpaid_query);
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo "Ksh." . number_format(htmlspecialchars($loan), 2)?></div>
+                                                <?php echo "Ksh." . (is_numeric($loan) ? number_format((float)$loan, 2) : "0.00")?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-landmark fa-2x text-gray-300"></i>

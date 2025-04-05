@@ -15,25 +15,37 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
     die("Invalid Contribution ID.");
 }
 
-$contribution_id = (int)$_GET['id']; // Ensure ID is an integer
+$contribution_id = (int)$_GET['id']; 
+$filter_status = isset($_GET['filter_status']) ? $_GET['filter_status'] : '';
 
-// Fetch Contribution Details
-$contribution_query = mysqli_query($mysqli, "SELECT * FROM contributions WHERE contribution_id = $contribution_id");
-if (!$contribution_query || mysqli_num_rows($contribution_query) == 0) {
+// Get contribution title
+$stmt = $mysqli->prepare("SELECT title FROM contributions WHERE contribution_id = ?");
+$stmt->bind_param("i", $contribution_id);
+$stmt->execute();
+$contrib = $stmt->get_result()->fetch_assoc();
+if (!$contrib) {
     die("Contribution not found.");
 }
-$contrib = mysqli_fetch_assoc($contribution_query);
 
-// Fetch Member Contributions
-$members_query = mysqli_query($mysqli, "SELECT mc.member_id, m.member_name, mc.amount_paid, mc.status 
-                                      FROM member_contributions mc 
-                                      JOIN members m ON mc.member_id = m.user_id 
-                                      WHERE mc.contribution_id = $contribution_id");
 
-if (!$members_query) {
-    die("Error fetching member contributions: " . mysqli_error($mysqli));
+// Prepare member contributions query
+$sql = "SELECT m.member_name AS member_name, c.amount_paid, c.status 
+        FROM member_contributions c
+        JOIN members m ON c.member_id = m.user_id 
+        WHERE c.contribution_id = ?";
+$params = [$contribution_id];
+$types = "i";
+
+if (!empty($filter_status)) {
+    $sql .= " AND c.status = ?";
+    $params[] = $filter_status;
+    $types .= "s";
 }
 
+$query = $mysqli->prepare($sql);
+$query->bind_param($types, ...$params);
+$query->execute();
+$members_query = $query->get_result();
 ?>
 
 
@@ -61,6 +73,20 @@ if (!$members_query) {
                 <?php if ($user_role == 'System Administrator') : ?>
                     <div class="container mt-4">
                         <h2><?php echo $contrib['title']; ?> - Member Contributions</h2>
+
+                        <form method="GET">
+                        <input type="hidden" name="id" value="<?php echo $contribution_id; ?>">
+                            <label for="filter_status">Filter by Status:</label>
+                            <select name="filter_status" id="filter_status" class="form-control col-6">
+                                <option value="">-- Select Status --</option>
+                                <option value="Paid" <?php echo ($filter_status == 'Paid') ? 'selected' : ''; ?>>Paid</option>
+                                <option value="Partially Paid" <?php echo ($filter_status == 'Partially Paid') ? 'selected' : ''; ?>>Partially Paid</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary m-2">Filter</button>
+
+                             <!-- Reset Filter Button -->
+                                <a href="?id=<?php echo $contribution_id; ?>" class="btn btn-secondary m-2">Reset Filter</a>
+                        </form>
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -79,7 +105,7 @@ if (!$members_query) {
                                 <?php } ?>
                             </tbody>
                         </table>
-                        <a href="contributions.php" class="btn btn-success">Back</a>
+                        <a href="contributions.php" class="btn btn-success m-2">Back</a>
                     </div>
 
 

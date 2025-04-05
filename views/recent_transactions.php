@@ -9,7 +9,7 @@ $query = "SELECT mc.contribution_id, c.title, c.due_date, mc.amount_paid, mc.sta
     JOIN contributions c ON mc.contribution_id = c.contribution_id
     WHERE mc.member_id = $user_id
     ORDER BY mc.payment_date DESC
-    LIMIT 5";  
+    LIMIT 3";  
 
 $result = mysqli_query($mysqli, $query);
 
