@@ -76,6 +76,15 @@
     </li>';
     ?>
 
+<?php if ($user_role == 'Member') echo '
+    <li class="nav-item">
+        <a class="nav-link" href="repayments">
+            <i class="fas fa-money-bill"></i>
+            <span>Repayments</span>
+        </a>
+    </li>';
+    ?>
+
     <li class="nav-item">
         <a class="nav-link" href="savings">
             <i class="fas fa-fw fa-piggy-bank"></i>

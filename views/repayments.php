@@ -3,6 +3,7 @@ session_start();
 require_once('../config/config.php');
 require_once('../config/checklogin.php');
 require_once('../partials/head.php');
+require_once('../views/loan_functions.php');
 $user_role = $_SESSION['user_access_level'];
 
 if (!isset($_SESSION['user_id'])) {
@@ -10,19 +11,55 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// fetch
-$sql = "SELECT r.repayment_id, u.user_name, r.loan_name, r.loan_amount, r.loan_interest, 
-r.processing_fee, r.amount_paid, r.repayment_date
-          FROM repayments r
-          JOIN users u ON r.user_id = u.user_id
-          ORDER BY r.repayment_date DESC";
-$result = $mysqli -> query($sql);
-$repayments = array();
-if($result -> num_rows > 0){
-    while($row = $result -> fetch_assoc()){
-       $repayments[] = $row;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['repayment_id'], $_POST['amount'])) {
+    $repayment_id = $_POST['repayment_id'];
+    $amount = floatval($_POST['amount']);
+
+    // Step 1: Get current repayment details including due_date and status
+    $stmt = $mysqli->prepare("SELECT loan_amount, amount_paid, due_date, status FROM repayments WHERE repayment_id = ?");
+    $stmt->bind_param("i", $repayment_id);
+    $stmt->execute();
+    $result_check = $stmt->get_result();
+    $repayment = $result_check->fetch_assoc();
+
+    if ($repayment) {
+        $loan_amount = $repayment['loan_amount'];
+        $amount_paid = $repayment['amount_paid'];
+        $due_date = new DateTime($repayment['due_date']);
+        $today = new DateTime();
+        $status = strtolower(trim($repayment['status']));
+
+        // Step 2: Calculate late fee (KES 5 per day after due date)
+        $late_fee = 0;
+        if ($status === 'overdue') {
+            $days_late = $due_date < $today ? $due_date->diff($today)->days : 0;
+            $late_fee = $days_late * 50;
+        }
+
+        $total_required = $loan_amount + $late_fee;
+        $new_paid = $amount_paid + $amount;
+
+        // Step 3: Determine new status
+        $new_status = ($new_paid >= $total_required) ? 'paid' : 'pending';
+
+        // Step 4: Update repayment record
+        $stmt = $mysqli->prepare("UPDATE repayments SET amount_paid = ?, repayment_date = CURDATE(), status = ? WHERE repayment_id = ?");
+        $stmt->bind_param("dsi", $new_paid, $new_status, $repayment_id);
+        $stmt->execute();
     }
 }
+
+updateOverdue($mysqli);
+
+if ($user_role == 'System Administrator') {
+    $result = getAllRepayments($mysqli);
+} elseif ($user_role == 'Member') {
+    $user_id = $_SESSION['user_id'];
+    $result = getRepayments($mysqli, $user_id);
+}
+
+
+
 
 ?>
 
@@ -47,7 +84,7 @@ if($result -> num_rows > 0){
                             <div class="card card-yellow card-outline">
                                 <div class="card-header">
                                     <div class="d-sm-flex align-items-center justify-content-between mb-0">
-                                        <h5 class="card-title m-0">Loan Repayments</h5>
+                                        <h5 class="card-title m-0">All Loan Repayments</h5>
                                         <a href="#addrepayment" data-toggle="modal" style="text-decoration:none;" class="d-none d-sm-inline-block shadow-sm"><button type="button" class="btn btn-block btn-primary">Add loan repayment</button></a>
                                     </div>
                                 </div>
@@ -58,44 +95,22 @@ if($result -> num_rows > 0){
                                             <table class="table table-bordered" id="datatable">
                                                 <thead>
                                                     <tr>
-                                                        <th style="width: 10px">No</th>
-                                                        <th>Member Name</th>
-                                                        <th>Loan Name</th>
-                                                        <th>Loan Amount</th>
-                                                        <th style="width: 30px">Loan Interest</th>
-                                                        <th style="width: 30px">Processing Fee</th>
-                                                        <th>Amount Paid</th>
-                                                        <th>Date</th>
-                                                        <th>Manage</th>
+                                                    <th>Member ID</th><th>Loan ID</th><th>Due Date</th><th>Amount Due</th>
+                                                    <th>Paid</th><th>Status</th><th>Payment Date</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <?php if (!empty($repayments)) : ?>
-                                                    <?php foreach ($repayments as $key => $repayment) : ?>
-                                                    <tr>
-                                                        <td><?php echo ($key + 1); ?></td>
-                                                        <td><?php echo htmlspecialchars($repayment['user_name']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($repayment['loan_name']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($repayment['loan_amount']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($repayment['loan_interest']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($repayment['processing_fee']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($repayment['amount_paid']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($repayment['repayment_date']); ?>
-                                                        </td>
-
+                                                <?php while ($row = $result->fetch_assoc()) { ?>
+                                                    <tr style="background: <?= $row['status'] == 'overdue' ? '#fdd' : '#dfd' ?>;">
+                                                        <td><?= $row['user_id'] ?></td>
+                                                        <td><?= $row['loan_id'] ?></td>
+                                                        <td><?= $row['due_date'] ?></td>
+                                                        <td><?= $row['loan_amount'] ?></td>
+                                                        <td><?= $row['amount_paid'] ?></td>
+                                                        <td><?= ucfirst($row['status']) ?></td>
+                                                        <td><?= $row['repayment_date'] ?></td>
                                                     </tr>
-                                                    <?php endforeach; ?>
-                                                    <?php else : ?>
-                                                    <tr>
-                                                        <td colspan="8">No records found</td>
-                                                    </tr>
-                                                    <?php endif; ?>
+                                                    <?php } ?>
                                                     <?php require_once('../modals/add_repayment.php'); ?>
                                                 </tbody>
                                             </table>
@@ -106,43 +121,65 @@ if($result -> num_rows > 0){
                         </div>
                     </div>
 
-                      <!-- loan repayments chart -->
-                <!-- <h3 style="color: #333; font-weight: bold;">🏦 Monthly Loan Repayments</h3>
-                <div style="width: 80%; margin: auto;">
-                    <canvas id="loanRepaymentsChart"></canvas>
-                </div>
-
-                <script>
-                    // Data for Monthly Loan Repayments (replace with dynamic PHP data)
-                    var months = ['January', 'February', 'March', 'April', 'May', 'June']; // X-axis labels (Months)
-                    var repayments = [500, 700, 400, 900, 650, 800]; // Y-axis values (Repayment Amount)
-
-                    var ctx2 = document.getElementById('loanRepaymentsChart').getContext('2d');
-
-                    // Create the bar chart
-                    var loanRepaymentsChart = new Chart(ctx2, {
-                        type: 'bar', // Bar chart
-                        data: {
-                            labels: months, // X-axis labels
-                            datasets: [{
-                                label: 'Monthly Loan Repayments',
-                                data: repayments, // Repayment amounts
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)', // Bar color
-                                borderColor: 'rgba(54, 162, 235, 1)', // Border color
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true // Start Y-axis from 0
+                     <!-- Members Dashboard -->
+                    <?php elseif ($user_role == 'Member') : ?>
+                        <div class="row">
+                            <div class="col-lg-12">
+                            <h2>My Loan Installments</h2>
+                            <table class="table table-bordered" id="datatable">
+                                <tr>
+                                    <th>Due Date</th><th>Amount Due</th><th>Paid</th><th>Status</th><th>Action</th>
+                                </tr>
+                                <?php
+                                if ($result->num_rows === 0) {
+                                    echo "<tr><td colspan='5'>⚠️ No repayments found</td></tr>";
                                 }
-                            }
-                        }
-                    });
-                </script> -->
+                                while ($row = $result->fetch_assoc()) {
+                                    $loan_amount = $row['loan_amount'];
+                                    $due_date = new DateTime($row['due_date']);
+                                    $today = new DateTime();
+                                    $late_fee = 0;
+                                
+                                    if (strtolower(trim($row['status'])) === 'overdue') {
+                                        $days_late = $due_date->diff($today)->days;
+                                        $late_fee = $days_late * 50; // KES 50 per day late fee
+                                    }
+                                
+                                    $total_due = $loan_amount + $late_fee;
+                                ?>
+                                <tr style="background: <?= $row['status'] == 'overdue' ? '#fdd' : '#dfd' ?>;">
+                                    <td><?= $row['due_date'] ?></td>
+                                    <td>
+                                        <?= $loan_amount ?>
+                                        <?php if ($late_fee > 0): ?>
+                                            <br><small class="text-danger">Late Fee: <?= $late_fee ?> <br>Total: <?= $total_due ?></small>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?= $row['amount_paid'] ?></td>
+                                    <td><?= ucfirst($row['status']) ?></td>
+                                    <td>
+                                        <?php
+                                        $status = strtolower(trim($row['status']));
+                                        if ($status === 'pending' || $status === 'overdue') {
+                                        ?>
+                                            <form method="POST">
+                                                <input type="hidden" name="repayment_id" value="<?= $row['repayment_id'] ?>">
+                                                <input type="number" name="amount" step="0.01" 
+                                                    max="<?= $total_due ?>" required 
+                                                    class="form-control" 
+                                                    placeholder="Max: <?= $total_due ?>">
+                                                <button type="submit" class="btn btn-outline-success mt-1">Pay</button>
+                                            </form>
+                                        <?php } else {
+                                            echo "✔️ <span class='badge bg-success'>Paid</span>";
+                                        } ?>
 
+                                    </td>
+                                </tr>
+                                <?php } ?>
+                            </table>
+                            </div>
+                        </div>
 
                 <?php endif; ?>
             </div>

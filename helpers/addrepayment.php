@@ -12,9 +12,8 @@ if(isset($_POST['loan_details'])){
 
     // prepare
     $stmt = $mysqli -> prepare("INSERT INTO repayments (user_id, loan_name, 
-    loan_amount, loan_interest, processing_fee, amount_paid, repayment_date) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt -> bind_param("isiiiid", $user_id, $loan_name, $loan_amount, 
-    $loan_interest, $processing_fee, $amount_paid, $repayment_date);
+    loan_amount, amount_paid, repayment_date) VALUES (?, ?, ?, ?, ?)");
+    $stmt -> bind_param("isidd", $user_id, $loan_name, $loan_amount, $amount_paid, $repayment_date);
 
     if ($stmt->execute()) {
         $_SESSION['success'] = "loan repayment details added successfully";
