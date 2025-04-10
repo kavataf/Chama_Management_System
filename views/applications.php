@@ -1,5 +1,16 @@
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <?php
 session_start();
+
+$success = $_SESSION['success'] ?? null;
+$err = $_SESSION['error'] ?? null;
+$info = $_SESSION['info'] ?? null;
+
+// Clear them so they don't show again
+unset($_SESSION['success'], $_SESSION['error'], $_SESSION['info']);
+
 require_once('../config/config.php');
 require_once('../config/checklogin.php');
 require_once('../partials/head.php');
@@ -141,6 +152,7 @@ if($result -> num_rows > 0){
         <i class="fas fa-angle-up"></i>
     </a>
 
+    <?php require_once('../partials/alert.php'); ?>
     <?php require_once('../partials/scripts.php'); ?>
 </body>
 

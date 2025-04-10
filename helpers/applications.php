@@ -2,7 +2,7 @@
 require_once("../config/config.php");
 
 if (isset($_POST['apply_loan'])) {
-    $user_id = $_SESSION['user_id']; // Get user_id from session
+    $user_id = $_SESSION['user_id']; 
     $loan_amount = $_POST['loan_amount'];
     $loan_duration = $_POST['loan_duration'];
     $loan_purpose = $_POST['loan_purpose'];
@@ -28,11 +28,6 @@ if (isset($_POST['apply_loan'])) {
         $_SESSION['error'] = "Selected loan does not exist!";
         header("Location: loans.php");
         exit();
-    }
-
-    // Apply penalty if necessary (Example condition: loan amount exceeds 50,000)
-    if ($loan_amount > 50000) {
-        $loan_amount += $penalty;
     }
 
     // Insert loan application with loan_id

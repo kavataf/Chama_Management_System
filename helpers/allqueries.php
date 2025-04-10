@@ -16,7 +16,7 @@ if (isset($_POST['update_expense'])) {
         $stmt_expense->store_result();
 
         if ($stmt_expense->num_rows > 0) {
-            $stmt_expense->close(); // Close after checking existence
+            $stmt_expense->close(); 
 
             // Prepare the SQL statement to update the expense
             $sql = "UPDATE expenses SET 
@@ -57,9 +57,6 @@ if (isset($_POST['update_expense'])) {
 // update saving
 if (isset($_POST['update_saving'])) {
     $savings_id = $_POST['savings_id'];
-    $member_name = $_POST['member_name'];
-    $member_id_no = $_POST['member_id_no'];
-    $member_phone = $_POST['member_phone'];
     $reference_no = $_POST['reference_no'];
     $amount = $_POST['amount'];
     $savings_date = $_POST['savings_date'];
@@ -73,13 +70,10 @@ if (isset($_POST['update_saving'])) {
         $stmt_saving->store_result();
 
         if ($stmt_saving->num_rows > 0) {
-            $stmt_saving->close(); // Close after checking existence
+            $stmt_saving->close(); 
 
             // Prepare the SQL statement to update the saving
             $sql = "UPDATE savings SET 
-                        member_name = ?, 
-                        member_id_no = ?, 
-                        member_phone = ?, 
                         reference_no = ?,
                         amount = ?,
                         savings_date = ?,
@@ -88,8 +82,8 @@ if (isset($_POST['update_saving'])) {
 
             if ($stmt_update = $mysqli->prepare($sql)) {
                 $stmt_update->bind_param(
-                    'sssssssi',
-                    $member_name, $member_id_no, $member_phone, $reference_no, $amount, $savings_date, $payment_method, $expense_id
+                    'ssssi',
+                    $reference_no, $amount, $savings_date, $payment_method, $savings_id
                 );
 
                 if ($stmt_update->execute()) {
@@ -97,7 +91,7 @@ if (isset($_POST['update_saving'])) {
                     header('Location: ../views/savings');
                     exit();
                 } else {
-                    echo "Error updating saving: " . $stmt_update->error;
+                    $_SESSION['error'] = "Error updating saving: " . $stmt_update->error;
                 }
 
                 $stmt_update->close();

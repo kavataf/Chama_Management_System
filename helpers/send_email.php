@@ -9,6 +9,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require 'C:\xampp1\htdocs\COMS\vendor\autoload.php'; 
+require 'C:\xampp1\htdocs\COMS\partials\alert.php'; 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
     $recipientType = $_POST['recipient_type'];
@@ -49,13 +50,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
 
         // Send email
         if ($mail->send()) {
-            echo "Email sent successfully!";
+            $success = "Email sent successfully!";
             // header('location: emails');
         } else {
-            echo "Failed to send email.";
+            $err = "Failed to send email.";
         }
     } catch (Exception $e) {
-        echo "Email could not be sent. Error: {$mail->ErrorInfo}";
+        $err = "Email could not be sent. Error: {$mail->ErrorInfo}";
     }
 }
 ?>
