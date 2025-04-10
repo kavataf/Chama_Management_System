@@ -107,4 +107,53 @@ if (isset($_POST['update_saving'])) {
         echo "Error checking saving: " . $mysqli->error;
     }
 }
+
+// update share
+if (isset($_POST['update_share'])) {
+    $shares_id = $_POST['id'];
+    $amount = $_POST['share_amount'];
+    $savings_date = $_POST['purchase_date'];
+
+    // Check if the share exists
+    $check_saving_sql2 = "SELECT id FROM shares WHERE id = ?";
+    if ($stmt_saving = $mysqli->prepare($check_saving_sql2)) {
+        $stmt_saving->bind_param('i', $shares_id);
+        $stmt_saving->execute();
+        $stmt_saving->store_result();
+
+        if ($stmt_saving->num_rows > 0) {
+            $stmt_saving->close(); 
+
+            // Prepare the SQL statement to update the share
+            $sql = "UPDATE shares SET 
+                        share_amount = ?,
+                        purchase_date = ?
+                    WHERE id = ?";
+
+            if ($stmt_update = $mysqli->prepare($sql)) {
+                $stmt_update->bind_param(
+                    'isi', $amount, $savings_date, $shares_id
+                );
+
+                if ($stmt_update->execute()) {
+                    $_SESSION['success'] = 'share updated successfully.';
+                    header('Location: ../views/savings');
+                    exit();
+                } else {
+                    $_SESSION['error'] = "Error updating share: " . $stmt_update->error;
+                }
+
+                $stmt_update->close();
+            } else {
+                echo "Error preparing update query: " . $mysqli->error;
+            }
+        } else {
+            echo "Error: share not found.";
+        }
+
+        $stmt_saving->close();
+    } else {
+        echo "Error checking share: " . $mysqli->error;
+    }
+}
 ?>

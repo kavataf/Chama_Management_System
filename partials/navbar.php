@@ -91,6 +91,15 @@
             <span>Savings</span>
         </a>
     </li>
+
+    <?php if ($user_role == 'System Administrator') echo '
+    <li class="nav-item">
+        <a class="nav-link" href="dividends">
+            <i class="fas fa-money-bill"></i>
+            <span>Dividends</span>
+        </a>
+    </li>';
+    ?>
     <?php if ($user_role == 'System Administrator') echo '
     <li class="nav-item">
         <a class="nav-link" href="expenses">
