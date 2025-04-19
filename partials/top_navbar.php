@@ -51,52 +51,89 @@
                         </form>
                     </div>
                 </li>
-
-
+                
                 <div class="topbar-divider d-none d-sm-block"></div>
 
                 <!-- Nav Item - User Information -->
                 <li class="nav-item dropdown no-arrow">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">
-                        <span
-                            class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
-                            <?php if ($user_role == 'Member') echo '
-                            <div class="notification-icon position-relative" onclick="showNotifications()">
-                                <span>🛎</span>
-                                <span id="notification-count" class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-circle"></span>
-                            </div>
+                <div class="d-flex align-items-center gap-2">
 
-                            <div id="notification-dropdown" 
-                            style="display: none; position: absolute; background: white; border: 1px solid #ccc; z-index: 999;">
-                                <ul id="notification-list"></ul>
-                            </div>
+                    <!-- User name -->
+                    <span class="d-none d-lg-inline text-gray-600 small">
+                        <?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                    </span>
+
+                    <?php if ($user_role == 'Member'): ?>
+                        <!-- Notification Icon -->
+                        <span class="notification-icon position-relative pc-head-link"
+                            id="notificationDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                            🛎
+                            <span id="notification-count"
+                                class="badge bg-success pc-h-badge position-absolute top-0 start-100 translate-middle rounded-circle"></span>
+                        </span>
+
+                        <!-- Profile Image with Dropdown -->
+                        <div class="dropdown">
+                            <img class="img-profile rounded-circle dropdown-toggle" id="userDropdown"
+                                src="../public/img/no-profile.png" style="height:25px; width:25px; cursor:pointer;"
+                                data-bs-toggle="dropdown" aria-expanded="false" />
                             
-                            <div class="ml-3">
-                              <img class="img-profile rounded-circle" src="../public/img/no-profile.png">
-                            </div>';
-                            ?>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="profile">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#logoutModal" data-toggle="modal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
 
-                            <?php if ($user_role == 'System Administrator') echo '
-                              <img class="img-profile rounded-circle" src="../public/img/no-profile.png">';
-                              ?>
-                    </a>
-                    <!-- Dropdown - User Information -->
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                        aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="profile">
-                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Profile
-                        </a>
-                        <!-- <a class="dropdown-item" href="#">
-                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                        Activity Log
-                    </a> -->
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#logoutModal" data-toggle="modal">
-                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Logout
-                        </a>
+                        <!-- Notification Dropdown -->
+                        <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown"
+                            aria-labelledby="notificationDropdownToggle" style="min-width: 350px;">
+                            <div class="dropdown-header d-flex align-items-center justify-content-between">
+                                <h5 class="m-0">Notifications</h5>
+                                <a href="#!" class="btn btn-link btn-sm">Mark all read</a>
+                            </div>
+                            <div id="notification-list"
+                                class="dropdown-body text-wrap header-notification-scroll position-relative"
+                                style="max-height: calc(100vh - 215px); overflow-y: auto;">
+                                <!-- Notifications will be injected here -->
+                            </div>
+                            <div class="text-center py-2">
+                                <a href="#!" class="link-danger">Clear all Notifications</a>
+                            </div>
+                        </div>
+
+                    <?php elseif ($user_role == 'System Administrator'): ?>
+                        <!-- Profile Only with Dropdown -->
+                        <div class="dropdown">
+                            <img class="img-profile rounded-circle dropdown-toggle" id="userDropdown"
+                                src="../public/img/no-profile.png" style="height:25px; width:25px; cursor:pointer;"
+                                data-bs-toggle="dropdown" aria-expanded="false" />
+
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="profile">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profile
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#logoutModal" data-toggle="modal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
 
                     </div>
                     <?php require_once('../partials/logout.php'); ?>
@@ -111,59 +148,69 @@
 <?php require_once('../customs/scripts/ajax.php'); ?>
 
 <script>
-    function showNotifications() {
-    let dropdown = document.getElementById("notification-dropdown");
-    
-    // Toggle visibility
-    if (dropdown.style.display === "block") {
-        dropdown.style.display = "none";
-        return;
+document.addEventListener("DOMContentLoaded", function () {
+    const notificationToggle = document.getElementById("notificationDropdownToggle");
+    const notificationDropdown = document.querySelector(".dropdown-notification");
+    const notificationList = document.getElementById("notification-list");
+    const notificationCount = document.getElementById("notification-count");
+
+    let dropdownVisible = false;
+
+    // Toggle notification dropdown manually
+    notificationToggle.addEventListener("click", function (e) {
+        e.stopPropagation();
+        dropdownVisible = !dropdownVisible;
+        notificationDropdown.style.display = dropdownVisible ? "block" : "none";
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener("click", function (e) {
+        if (!notificationDropdown.contains(e.target) && !notificationToggle.contains(e.target)) {
+            notificationDropdown.style.display = "none";
+            dropdownVisible = false;
+        }
+    });
+
+    // Fetch notifications from server
+    function fetchNotifications() {
+        fetch('fetch_notifications.php')
+            .then(response => response.json())
+            .then(data => {
+                notificationList.innerHTML = "";
+                if (data.length > 0) {
+                    data.forEach(msg => {
+                        const li = document.createElement("div");
+                        li.className = "dropdown-item text-wrap";
+                        li.textContent = msg.message || msg; // adapt based on your PHP response format
+                        notificationList.appendChild(li);
+                    });
+                    notificationCount.textContent = data.length;
+                } else {
+                    notificationList.innerHTML = '<div class="dropdown-item text-muted">No notifications</div>';
+                    notificationCount.textContent = "";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching notifications:", error);
+                notificationList.innerHTML = '<div class="dropdown-item text-muted">Failed to load notifications</div>';
+            });
     }
 
-    // Fetch notifications
-    fetch('fetch_notifications.php')
-        .then(response => response.json())
-        .then(data => {
-            let notificationList = document.getElementById("notification-list");
-            notificationList.innerHTML = ""; 
-            
-            if (data.length === 0) {
-                notificationList.innerHTML = "<li>No new notifications</li>";
-            } else {
-                data.forEach(notification => {
-                    let li = document.createElement("li");
-                    li.textContent = notification.message;
-                    notificationList.appendChild(li);
-                });
-            }
-            dropdown.style.display = "block"; 
-            dropdown.style.position = "absolute";
-            dropdown.style.top = "60px"; 
-            dropdown.style.right = "0";
-            dropdown.style.width = "200px";
-            dropdown.style.backgroundColor = "white";
-            dropdown.style.border = "1px solid #ccc";
-            dropdown.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
-            dropdown.style.maxHeight = "400px"; 
-            dropdown.style.overflowY = "auto"; 
-            dropdown.style.padding = "10px";
-            dropdown.style.zIndex = "9999";
-        })
-        .catch(error => console.error("Error fetching notifications:", error));
-}
+    fetchNotifications();
 
-function updateNotificationCount() {
-    fetch('fetch_notifications.php')
-        .then(response => response.json())
-        .then(data => {
-            let countElement = document.getElementById("notification-count");
-            let count = data.length;
-            countElement.textContent = count > 0 ? count : "";
-        });
-}
+    // Mark all as read
+    document.querySelector(".btn-link.btn-sm").addEventListener("click", function (e) {
+        e.preventDefault();
+        notificationCount.textContent = "";
+        // Optionally: send a request to mark all as read in the backend
+    });
 
-// Update count every 30 seconds
-setInterval(updateNotificationCount, 30000);
-updateNotificationCount();
-
+    // Clear all notifications
+    document.querySelector(".link-danger").addEventListener("click", function (e) {
+        e.preventDefault();
+        notificationList.innerHTML = '<div class="dropdown-item text-muted">No notifications</div>';
+        notificationCount.textContent = "";
+        // Optionally: send a request to clear all notifications in the backend
+    });
+});
 </script>

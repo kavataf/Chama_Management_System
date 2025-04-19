@@ -59,4 +59,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
         $err = "Email could not be sent. Error: {$mail->ErrorInfo}";
     }
 }
+
+// home page contact form
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sentMessage'])) {
+    $name    = $_POST['name'] ?? '';
+    $email   = $_POST['email'] ?? '';
+    $subject = $_POST['subject'] ?? '';
+    $message = $_POST['message'] ?? '';
+
+    $mail = new PHPMailer(true);
+
+    try {
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host       = 'smtp.gmail.com';
+        $mail->SMTPAuth   = true;
+        $mail->Username   = 'kavatafaith412@gmail.com'; 
+        $mail->Password   = 'cfte fgux afpr kvrp';      
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        $mail->Port       = 587;
+
+        // Sender & recipient
+        $mail->setFrom('kavatafaith412@gmail.com', 'Chama Website');
+        $mail->addReplyTo($email, $name);
+        $mail->addAddress('kavatafaith412@gmail.com', 'Admin'); 
+
+        // Email content
+        $mail->isHTML(true);
+        $mail->Subject = "New Contact Form Submission: $subject";
+        $mail->Body    = "
+            <h3>New Contact Message</h3>
+            <p><strong>Name:</strong> {$name}</p>
+            <p><strong>Email:</strong> {$email}</p>
+            <p><strong>Subject:</strong> {$subject}</p>
+            <p><strong>Message:</strong><br>{$message}</p>
+        ";
+
+        // Send the email
+        if ($mail->send()) {
+            echo "Message has been sent successfully!";
+        } else {
+            echo "Mailer Error: " . $mail->ErrorInfo;
+        }
+
+    } catch (Exception $e) {
+        echo "Mailer Error (Exception): " . $mail->ErrorInfo;
+    }
+}
 ?>
