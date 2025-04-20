@@ -69,16 +69,16 @@
                             id="notificationDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                             🛎
                             <span id="notification-count"
-                                class="badge bg-success pc-h-badge position-absolute top-0 start-100 translate-middle rounded-circle"></span>
+                                class="badge bg-success pc-h-badge position-absolute top-0 translate-middle rounded-circle"></span>
                         </span>
 
                         <!-- Profile Image with Dropdown -->
-                        <div class="dropdown">
+                        <!-- <div class="dropdown">
                             <img class="img-profile rounded-circle dropdown-toggle" id="userDropdown"
                                 src="../public/img/no-profile.png" style="height:25px; width:25px; cursor:pointer;"
                                 data-bs-toggle="dropdown" aria-expanded="false" />
                             
-                            <!-- Dropdown - User Information -->
+                            
                             <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in"
                                 aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="profile">
@@ -91,10 +91,10 @@
                                     Logout
                                 </a>
                             </div>
-                        </div>
+                        </div> -->
 
                         <!-- Notification Dropdown -->
-                        <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown"
+                        <!-- <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown"
                             aria-labelledby="notificationDropdownToggle" style="min-width: 350px;">
                             <div class="dropdown-header d-flex align-items-center justify-content-between">
                                 <h5 class="m-0">Notifications</h5>
@@ -103,12 +103,12 @@
                             <div id="notification-list"
                                 class="dropdown-body text-wrap header-notification-scroll position-relative"
                                 style="max-height: calc(100vh - 215px); overflow-y: auto;">
-                                <!-- Notifications will be injected here -->
+                                 Notifications will be injected here 
                             </div>
                             <div class="text-center py-2">
                                 <a href="#!" class="link-danger">Clear all Notifications</a>
                             </div>
-                        </div>
+                        </div> -->
 
                     <?php elseif ($user_role == 'System Administrator'): ?>
                         <!-- Profile Only with Dropdown -->

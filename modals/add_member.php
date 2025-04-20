@@ -34,7 +34,6 @@ require_once('../config/codeGen.php');
                                     <option value="">Select</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
-                                    <option value="Binary">Other</option>
                                 </select>
                             </div>
                         </div>
