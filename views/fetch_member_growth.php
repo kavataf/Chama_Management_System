@@ -19,5 +19,9 @@ while ($row = $result->fetch_assoc()) {
 }
 
 // Return JSON response
-echo json_encode(["labels" => $labels, "values" => $values]);
+if (empty($labels) || empty($values)) {
+    echo json_encode(["message" => "No members found"]);
+} else {
+    echo json_encode(["labels" => $labels, "values" => $values]);
+}
 ?>

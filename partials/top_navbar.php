@@ -18,7 +18,7 @@
                         <a href="home" class="navbar-brand">
 
                             <span class="brand-text font-weight-light">
-                                <b>Chama Management System <small>(COMS)</small>.</b>
+                            <b>Chama Management System <small>(COMS)</small>.</b>
                             </span>
                         </a>
 
@@ -51,89 +51,45 @@
                         </form>
                     </div>
                 </li>
-                
+
+
                 <div class="topbar-divider d-none d-sm-block"></div>
 
                 <!-- Nav Item - User Information -->
                 <li class="nav-item dropdown no-arrow">
-                <div class="d-flex align-items-center gap-2">
-
-                    <!-- User name -->
-                    <span class="d-none d-lg-inline text-gray-600 small">
-                        <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-                    </span>
-
-                    <?php if ($user_role == 'Member'): ?>
-                        <!-- Notification Icon -->
-                        <span class="notification-icon position-relative pc-head-link"
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <span
+                            class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                        </span>
+                        <?php if ($user_role == 'Member'): ?>
+                            <span class="notification-icon position-relative pc-head-link"
                             id="notificationDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                             🛎
                             <span id="notification-count"
                                 class="badge bg-success pc-h-badge position-absolute top-0 translate-middle rounded-circle"></span>
-                        </span>
+                            </span>
+                        <?php endif; ?>
 
-                        <!-- Profile Image with Dropdown -->
-                        <!-- <div class="dropdown">
-                            <img class="img-profile rounded-circle dropdown-toggle" id="userDropdown"
-                                src="../public/img/no-profile.png" style="height:25px; width:25px; cursor:pointer;"
-                                data-bs-toggle="dropdown" aria-expanded="false" />
-                            
-                            
-                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="profile">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#logoutModal" data-toggle="modal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </div> -->
+                        <img class="img-profile rounded-circle" src="../public/img/no-profile.png">
 
-                        <!-- Notification Dropdown -->
-                        <!-- <div class="dropdown-menu dropdown-notification dropdown-menu-end pc-h-dropdown"
-                            aria-labelledby="notificationDropdownToggle" style="min-width: 350px;">
-                            <div class="dropdown-header d-flex align-items-center justify-content-between">
-                                <h5 class="m-0">Notifications</h5>
-                                <a href="#!" class="btn btn-link btn-sm">Mark all read</a>
-                            </div>
-                            <div id="notification-list"
-                                class="dropdown-body text-wrap header-notification-scroll position-relative"
-                                style="max-height: calc(100vh - 215px); overflow-y: auto;">
-                                 Notifications will be injected here 
-                            </div>
-                            <div class="text-center py-2">
-                                <a href="#!" class="link-danger">Clear all Notifications</a>
-                            </div>
-                        </div> -->
-
-                    <?php elseif ($user_role == 'System Administrator'): ?>
-                        <!-- Profile Only with Dropdown -->
-                        <div class="dropdown">
-                            <img class="img-profile rounded-circle dropdown-toggle" id="userDropdown"
-                                src="../public/img/no-profile.png" style="height:25px; width:25px; cursor:pointer;"
-                                data-bs-toggle="dropdown" aria-expanded="false" />
-
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in"
-                                aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="profile">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Profile
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#logoutModal" data-toggle="modal">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Logout
-                                </a>
-                            </div>
-                        </div>
-                    <?php endif; ?>
-
-                </div>
+                    </a>
+                    <!-- Dropdown - User Information -->
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                        aria-labelledby="userDropdown">
+                        <a class="dropdown-item" href="profile">
+                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Profile
+                        </a>
+                        <!-- <a class="dropdown-item" href="#">
+                        <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+                        Activity Log
+                    </a> -->
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Logout
+                        </a>
 
                     </div>
                     <?php require_once('../partials/logout.php'); ?>

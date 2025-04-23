@@ -47,7 +47,7 @@ $sql4 = "SELECT COUNT(*) AS loan_applications FROM applications";
 $result = $mysqli -> query($sql4);
 if($result -> num_rows > 0){
     while($row = $result -> fetch_assoc()){
-        $loans = $row['loan_applications'];
+        $loannum = $row['loan_applications'];
     }
 }
 
@@ -70,11 +70,71 @@ $unpaid_query = mysqli_query($mysqli,
 
 $unpaid_result = mysqli_fetch_assoc($unpaid_query);
 
+// Fetch active loans
+$sql6 = "SELECT loan_name, total_payable, application_date, loan_status, loan_amount 
+        FROM applications 
+        WHERE loan_status = 'approved'
+        ORDER BY application_date DESC";
+$result = $mysqli->query($sql6);
+
+// Prepare data
+$loans = [];
+$totalPayable = 0;
+$totalLoanAmount = 0;
+
+while ($row = $result->fetch_assoc()) {
+    $loans[] = $row;
+    $totalPayable += $row['total_payable'];
+    $totalLoanAmount += $row['loan_amount'];
+}
+
+$profit = $totalPayable - $totalLoanAmount;
+$profitPercent = $totalLoanAmount > 0 ? ($profit / $totalLoanAmount) * 100 : 0;
+
+// Fetch pending contributions
+$sql7 = "SELECT * 
+FROM contributions 
+WHERE due_date >= CURDATE()
+ORDER BY due_date ASC";
+$result = $mysqli->query($sql7);
+
+$pending_contributions = [];
+if($result -> num_rows > 0){
+    while ($row = $result -> fetch_assoc()){
+        $pending_contributions[] = $row;
+    }
+}
 
 ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <body id="page-top">
+    <style>
+       
+        .active-loan-scroll::-webkit-scrollbar {
+        width: 6px;
+        }
+
+        .active-loan-scroll::-webkit-scrollbar-track {
+        background: transparent;
+        }
+
+        .active-loan-scroll::-webkit-scrollbar-thumb {
+        background-color: #d1d5db; /* Soft gray */
+        border-radius: 4px;
+        }
+
+        .active-loan-scroll:hover::-webkit-scrollbar-thumb {
+        background-color: #a0aec0; /* Darker on hover */
+        }
+
+        /* Firefox scrollbar */
+        .active-loan-scroll {
+        scrollbar-width: thin;
+        scrollbar-color: #d1d5db transparent;
+        }
+
+    </style>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -112,7 +172,7 @@ $unpaid_result = mysqli_fetch_assoc($unpaid_query);
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Members</span>
+                                                    <span class="info-box-text">Total Members</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
@@ -135,11 +195,11 @@ $unpaid_result = mysqli_fetch_assoc($unpaid_query);
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Loans</span>
+                                                    <span class="info-box-text">Total Loan applications</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo htmlspecialchars($loans)?></div>
+                                                <?php echo htmlspecialchars($loannum)?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-landmark fa-2x text-gray-300"></i>
@@ -158,7 +218,7 @@ $unpaid_result = mysqli_fetch_assoc($unpaid_query);
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Contributions</span>
+                                                    <span class="info-box-text">Number of contributions</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
@@ -172,80 +232,242 @@ $unpaid_result = mysqli_fetch_assoc($unpaid_query);
                             </div>
                         </div>
                     </div>
-                    <!-- /.col-md-6 -->
-                    <!-- Applications Breakdown Per Sub county -->
                 </div>
-                <div class="row">
-                    <div class="col-xl-6">
-                        <!-- member growth chart -->
-                        <h4 style="color: #333; font-weight: bold;" class="mt-4">📊 Member Growth Over Time</h4>
-                        <div class="chart-container" width="300px" height="300px">
-                            <canvas id="memberGrowthChart" width="100%" height="100%"></canvas>
-                        </div>
-
-                        <script>
-                            fetch('fetch_member_growth.php')
-                                .then(response => response.json())
-                                .then(data => {
-                                    const ctx = document.getElementById('memberGrowthChart').getContext('2d');
-
-                                    new Chart(ctx, {
-                                        type: 'line',
-                                        data: {
-                                            labels: data.labels, 
-                                            datasets: [{
-                                                label: 'Total Members',
-                                                data: data.values, 
-                                                borderColor: 'blue',
-                                                backgroundColor: 'rgba(0, 0, 255, 0.1)',
-                                                borderWidth: 2,
-                                                fill: true
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            scales: {
-                                                y: {
-                                                    beginAtZero: true
-                                                }
-                                            }
-                                        }
-                                    });
-                                })
-                                .catch(error => console.error('Error fetching data:', error));
-                        </script>
-
-                    </div>
-                    <div class="col-xl-6">
-                        <!-- loan distribution chart -->
-                        <h4 style="color: #333; font-weight: bold;" class="mt-4">🏦 Loan Distribution Percentages</h4>
-                            
-                            <div class="chart-container" width = "400px" height = "400px">
-                                <canvas id="loanDistributionChart" width = "400px" height = "400px"></canvas>
+                <div class="row g-3">
+                    <!-- loan applications -->
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                            <div class="card-title">Loan Applications by Status</div>
+                            <div style="height: 250px;">
+                                <canvas id="loanChart" width="100%" height="90%"></canvas>
                             </div>
-
-                            <script>
-                                fetch('loan_distribution.php') 
-                                    .then(response => response.json())
-                                    .then(data => {
-                                        const ctx = document.getElementById('loanDistributionChart').getContext('2d');
-
-                                        new Chart(ctx, {
-                                            type: 'pie',
-                                            data: {
-                                                labels: ['Approved Loans', 'Savings', 'Repayments'],
-                                                datasets: [{
-                                                    label: 'Loan Distribution',
-                                                    data: [data.approved_loans, data.savings, data.repayments],
-                                                    backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
-                                                }]
-                                            }
-                                        });
-                                    })
-                                    .catch(error => console.error('Error fetching data:', error));
-                            </script>
+                        </div>
                     </div>
-              </div>
+                    <!-- Member Growth Chart Card -->
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                        <div class="card-title">📊 Member Growth Over Time</div>
+                        <div style="height: 250px;">
+                            <canvas id="memberGrowthChart" width="100%" height="90%"></canvas>
+                        </div>
+                        </div>
+                    </div>
+
+                    <!-- Loan Distribution Chart Card -->
+                    <div class="col-md-4">
+                        <div class="card p-3">
+                        <div class="card-title">🏦 Loan Distribution</div>
+                        <div style="height: 250px;">
+                            <canvas id="loanDistributionChart" width="100%" height="90%"></canvas>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card shadow-sm rounded-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 class="mb-1">💼 Active Loans</h5>
+                                    <small class="text-muted">Profit to be realized</small>
+                                </div>
+                                <div class="text-success fw-bold">
+                                    <i class="fa fa-arrow-up"></i>
+                                    KSh <?php echo number_format($profit); ?> 
+                                    <small class="text-success">(<?php echo number_format($profitPercent, 1); ?>%)</small>
+                                </div>
+                                </div>
+                                <div class="active-loan-scroll" style="max-height: 280px; overflow: auto;">
+                                    <table class="table table-borderless align-middle small">
+                                    <thead>
+                                        <tr class="text-muted small text-uppercase">
+                                        <th style="width: 10px;">S/N</th>
+                                        <th style="width: 50%;">Loan Name</th>
+                                        <th>Total Payable</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php $i = 1; foreach ($loans as $loan): ?>
+                                        <tr>
+                                        <td><?php echo sprintf('%02d', $i++); ?></td>
+                                        <td><?php echo htmlspecialchars($loan['loan_name']); ?></td>
+                                        <td>KSh <?php echo number_format($loan['total_payable']); ?></td>
+                                        <td><?php echo date('d/m/Y', strtotime($loan['application_date'])); ?></td>
+                                        <td>
+                                            <span class="text-success"><?php echo ucfirst($loan['loan_status']); ?></span>
+                                        </td>
+                                        </tr>
+                                        <tr><td colspan="5"><hr class="my-1"></td></tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card shadow-sm rounded-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <h5 class="mb-1">💰 Pending Contributions</h5>
+                                    </div>
+                                </div>
+                                <div class="active-loan-scroll" style="max-height: 280px; overflow: auto;">
+                                    <table class="table table-borderless align-middle small">
+                                    <thead>
+                                        <tr class="text-muted small text-uppercase">
+                                        <th>S/N</th>
+                                        <th>Title</th>
+                                        <th>Amount</th>
+                                        <th>Due Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php $i = 1; foreach ($pending_contributions as $pending_contribution): ?>
+                                        <tr>
+                                        <td><?php echo sprintf('%02d', $i++); ?></td>
+                                        <td><?php echo htmlspecialchars($pending_contribution['title']); ?></td>
+                                        <td>KSh <?php echo number_format($pending_contribution['amount']); ?></td>
+                                        <td><?php echo date('d/m/Y', strtotime($pending_contribution['due_date'])); ?></td>
+                                        </tr>
+                                        <tr><td colspan="5"><hr class="my-1"></td></tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    <!-- Scripts -->
+                    <script>
+                    // Member Growth Chart
+                    fetch('fetch_member_growth.php')
+                        .then(response => response.json())
+                        .then(data => {
+                        const ctx = document.getElementById('memberGrowthChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Total Members',
+                                data: data.values,
+                                borderColor: 'blue',
+                                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                                borderWidth: 2,
+                                fill: true
+                            }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                title: {
+                                    display: true,
+                                    text: (ctx) => 'Point Style: ' + ctx.chart.data.datasets[0].pointStyle,
+                                }
+                                }
+                            }
+                        });
+                        })
+                        .catch(error => console.error('Error fetching data:', error));
+
+                    // Loan Distribution Chart
+                    fetch('loan_distribution.php')
+                        .then(response => response.json())
+                        .then(data => {
+                        const ctx = document.getElementById('loanDistributionChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'polarArea',
+                            data: {
+                            labels: ['Approved Loans', 'Savings', 'Repayments'],
+                            datasets: [{
+                                label: 'Loan Distribution',
+                                data: [data.approved_loans, data.savings, data.repayments],
+                                backgroundColor: ['#ff6384', '#36a2eb', '#ffce56']
+                            }]
+                            },
+                            options: {
+                            responsive: true,
+                            scales: {
+                            r: {
+                                pointLabels: {
+                                display: true,
+                                centerPointLabels: true,
+                                font: {
+                                    size: 18
+                                }
+                                }
+                            }
+                            },
+                            plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                            }
+                            }
+                        },
+                        });
+                        })
+                        .catch(error => console.error('Error fetching data:', error));
+                    </script>
+
+                    <script>
+                        fetch('loanapplications.php')
+                        .then(response => response.json())
+                        .then(data => {
+                            // Check if there's a message indicating no data
+                            if (data.message) {
+                            document.getElementById("loanRepaymentChart").replaceWith(
+                                `<p class="text-muted">${data.message}</p>`
+                            );
+                            return; 
+                            }
+
+                            // If there's data, process it and create the chart
+                            const labels = data.map(item => item.loan_status);
+                            const values = data.map(item => item.total);
+
+                            const ctx = document.getElementById('loanChart').getContext('2d');
+                            new Chart(ctx, {
+                            type: 'doughnut',  
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                label: 'Applications',
+                                data: values,
+                                backgroundColor: ['#4CAF50', '#FFC107', '#F44336'], 
+                                borderColor: ['#4CAF50', '#FFC107', '#F44336'], 
+                                borderWidth: 1
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                legend: { position: 'top' },
+                                title: {
+                                    display: true,
+                                    text: 'Loan Applications by Status'
+                                }
+                                },
+                                cutoutPercentage: 70,  
+                                rotation: Math.PI * 1.5  
+                            }
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching chart data:', error);
+                        });
+                    </script>
+
 
                 <!-- Members Dashboard -->
                 <?php elseif ($user_role == 'Member') : ?>
@@ -322,54 +544,82 @@ $unpaid_result = mysqli_fetch_assoc($unpaid_query);
                     <!-- Applications Breakdown Per Sub county -->
                 </div>
 
-                <div class="row">
-                   <div class="col-xl-6 mt-4">
-                        <h4 style="color: #333; font-weight: bold;">📊 loan Repayment Over Time</h4>
-                            <div class="chart-container" width="500px" height="400px" margin="auto">
-                                <canvas id="loanRepaymentChart" width="500px" height="400px"></canvas>
-                            </div>
+                <div class="row g-3">
+                    <!-- Loan repayment Chart Card -->
+                    <div class="col-md-6">
+                        <div class="card p-3">
+                        <div class="card-title">💸 Loan Repayment Progress</div>
+                        <div style="height: 300px;">
+                            <canvas id="loanRepaymentChart" width="500px" height="250px"></canvas>
+                        </div>
+                        </div>
+                    </div>
 
-                        <script>
-                            fetch('loanrepaymentchart.php') 
-                            .then(response => response.json())
-                            .then(chartData => {
-                                const ctx = document.getElementById("loanRepaymentChart").getContext("2d");
-
-                                new Chart(ctx, {
-                                type: "line",
-                                data: {
-                                    labels: chartData.labels, 
-                                    datasets: [{
-                                        label: "Loan Repayment Progress",
-                                        data: chartData.data, 
-                                        borderColor: "rgba(75, 192, 192, 1)",
-                                        backgroundColor: "rgba(75, 192, 192, 0.2)",
-                                        fill: true,
-                                        tension: 0.4
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    plugins: {
-                                        legend: { display: true }
-                                    },
-                                    scales: {
-                                        x: { title: { display: true, text: "Date" } },
-                                        y: { title: { display: true, text: "Amount Paid (KSH)" }, beginAtZero: true }
-                                    }
-                                }
-                                });
-                            })
-                            .catch(error => console.error("Error fetching chart data:", error));
-                        </script>
-                   </div>
-
-                   <div class="col-xl-6">
-                        <div class="container mt-4">
-                            <h4 style="color: #333; font-weight: bold;">Recent transactions</h4>
+                    <!-- Recent transactions Card -->
+                    <div class="col-md-6">
+                        <div class="card p-3">
+                        <div class="card-title">🏦 Recent transactions</div>
+                        <div style="height: 250px; overflow: auto;">
                             <div id="transactions-list"></div>
                         </div>
-                        <script>
+                        </div>
+                    </div>
+                </div>
+                <!-- repayment -->
+                <script>
+                    fetch('loanrepaymentchart.php') 
+                        .then(response => response.json())
+                        .then(chartData => {
+                            if (chartData.message) {
+                                document.getElementById("loanRepaymentChart").replaceWith(
+                                    `<p class="text-muted">${chartData.message}</p>`
+                                );
+                                return;
+                                }
+                        const ctx = document.getElementById("loanRepaymentChart").getContext("2d");
+
+                        new Chart(ctx, {
+                            type: "bar",
+                            data: {
+                            labels: chartData.labels, 
+                            datasets: [{
+                                label: "Loan Repayment Progress",
+                                data: chartData.data, 
+                                borderColor: "rgba(75, 192, 192, 1)",
+                                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                                fill: true,
+                                tension: 0.4
+                            }]
+                            },
+                            options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: true }
+                            },
+                            scales: {
+                                x: {
+                                title: {
+                                    display: true,
+                                    text: "Date"
+                                }
+                                },
+                                y: {
+                                title: {
+                                    display: true,
+                                    text: "Amount Paid (KSH)"
+                                },
+                                beginAtZero: true
+                                }
+                            }
+                            }
+                        });
+                        })
+                        .catch(error => console.error("Error fetching chart data:", error));
+                </script>
+
+                    <!-- transaction list -->
+                    <script>
                             $(document).ready(function () {
                                 fetch('recent_transactions.php')
                                     .then(response => response.json())
@@ -403,10 +653,8 @@ $unpaid_result = mysqli_fetch_assoc($unpaid_query);
                                     .catch(error => console.error('Error fetching transactions:', error));
                             });
 
-                        </script>
-
-                   </div>
-                </div>
+                    </script>
+                
                 <?php endif; ?>
             </div>
             <!-- /.row -->

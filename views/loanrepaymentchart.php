@@ -32,7 +32,11 @@ while($row = $result -> fetch_assoc()){
 }
 
 $stmt -> close();
- 
-echo json_encode(['labels' => $labels, 'data' => $data]);
+
+if (empty($labels) || empty($data)) {
+    echo json_encode(["message" => "No repayments found"]);
+} else {
+    echo json_encode(['labels' => $labels, 'data' => $data]);
+}
 
 ?>

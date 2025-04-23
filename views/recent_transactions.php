@@ -20,5 +20,9 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 
 header('Content-Type: application/json');
-echo json_encode($transactions);
+if (empty($transactions)) {
+    echo json_encode(["message" => "No transactions found"]);
+} else {
+    echo json_encode($transactions);
+}
 ?>
