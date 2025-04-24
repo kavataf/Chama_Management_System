@@ -17,11 +17,21 @@ if (isset($_POST['Login'])) {
             // Bind session variables
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['user_name'] = $row['user_name'];
+            $_SESSION['user_email'] = $row['user_email'];
             $_SESSION['user_access_level'] = $row['user_access_level'];
             $_SESSION['success'] = 'Login successful';
-            $success = 'Login successful';
-            header('Location: home');
-            exit;
+
+            // Generate and send auth code
+             $auth_code = rand(100000, 999999);
+             $_SESSION['auth_code'] = $auth_code;
+             $_SESSION['auth_code_created_at'] = time(); 
+
+             // Send code via email
+             require_once('../mailers/send-auth-code.php');
+ 
+            // Redirect to auth-code page
+             header("Location: auth-code.php");
+             exit;
         } else {
             $err = "Invalid login credentials";
         }

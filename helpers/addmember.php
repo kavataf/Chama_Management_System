@@ -1,5 +1,12 @@
 <?php 
+require 'C:\xampp1\htdocs\COMS\vendor\PHPMailer-master\src\PHPMailer.php';
+require 'C:\xampp1\htdocs\COMS\vendor\PHPMailer-master\src\Exception.php';
+require 'C:\xampp1\htdocs\COMS\vendor\PHPMailer-master\src\SMTP.php';
+require 'C:\xampp1\htdocs\COMS\vendor\autoload.php';
 require_once('../config/config.php'); 
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 if (isset($_POST['member_details'])) {
     $member_name = trim($_POST['member_name']);
@@ -15,7 +22,7 @@ if (isset($_POST['member_details'])) {
     $mysqli->begin_transaction();
 
     try {
-        // Prepare to insert into users table
+        // Insert into users table
         $stmt = $mysqli->prepare("INSERT INTO users (user_name, user_gender, user_id_no, 
             user_email, user_phone, user_access_level, user_password, user_unhashed_password) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
@@ -23,22 +30,58 @@ if (isset($_POST['member_details'])) {
             $member_phone, $access_level, $hashed_password, $member_password);
 
         if ($stmt->execute()) {
-            $user_id = $mysqli->insert_id; // Get the generated user ID
+            $user_id = $mysqli->insert_id;
             $_SESSION['user_id'] = $user_id;
 
-            // Prepare to insert into members table
+            // Insert into members table
             $stmt2 = $mysqli->prepare("INSERT INTO members (user_id, member_name, member_gender, 
                 member_email, member_phone, member_id_no) VALUES (?, ?, ?, ?, ?, ?)");
             $stmt2->bind_param("isssss", $user_id, $member_name, $member_gender, 
                 $member_email, $member_phone, $member_id_no);
 
             if ($stmt2->execute()) {
-                // Commit transaction after both inserts are successful
                 $mysqli->commit();
+
+                // Send login credentials via email
+                $mail = new PHPMailer(true);
+                try {
+                    // Server settings
+                    $mail->isSMTP();
+                    $mail->Host = 'smtp.gmail.com';
+                    $mail->SMTPAuth = true;
+                    $mail->Username = 'kavatafaith412@gmail.com'; 
+                    $mail->Password = 'cfte fgux afpr kvrp'; 
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                    $mail->Port = 587;
+
+                    // Recipients
+                    $mail->setFrom('kavatafaith412@gmail.com', 'PamojaSave Chama System');
+                    $mail->addAddress($member_email, $member_name);
+
+                    // Content
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Welcome to PamojaSave Chama System';
+                    $mail->Body = "
+                        <h3>Welcome, $member_name!</h3>
+                        <p>Your account has been created successfully. Below are your login credentials:</p>
+                        <p><strong>Email:</strong> $member_email<br>
+                        <strong>Temporary Password:</strong> $member_password</p>
+                        <p>Please log in or set your own password via the link below:</p>
+                        <a href='http://localhost/COMS/first-time-login.php'>Set New Password</a>
+                        <p>Thank you!</p>
+                    ";
+
+                    $mail->send();
+                } catch (Exception $e) {
+                    $_SESSION['error'] = "Member added but email not sent. Mailer Error: {$mail->ErrorInfo}";
+                    header("location: members.php");
+                    exit;
+                }
 
                 $_SESSION['success'] = "Member added successfully. Password has been sent to the email.";
                 header("location: members.php");
                 exit;
+
             } else {
                 throw new Exception("Failed to insert into members table: " . $stmt2->error);
             }
@@ -46,10 +89,9 @@ if (isset($_POST['member_details'])) {
             throw new Exception("Failed to insert into users table: " . $stmt->error);
         }
     } catch (Exception $e) {
-        // Rollback transaction if any error occurs
         $mysqli->rollback();
         $_SESSION['error'] = "Something went wrong, please try again. " . $e->getMessage();
-        header("location: members.php"); 
+        header("location: members.php");
         exit;
     }
 }

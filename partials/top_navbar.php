@@ -15,11 +15,11 @@
             <form class="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                 <div class="input-group">
                     <div class="container">
-                        <a href="home" class="navbar-brand">
-
-                            <span class="brand-text font-weight-light">
-                            <b>Chama Management System <small>(COMS)</small>.</b>
-                            </span>
+                        <a href="#" class="navbar-brand">
+                        <span class="brand-text font-weight-light col d-flex flex-column">
+                            <b style="font-weight: 800; font-size: 25px">Welcome <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</b>
+                            <small>Today is <?php echo date("l, F j, Y"); ?></small>
+                        </span>
                         </a>
 
                     </div>
@@ -59,8 +59,9 @@
                 <li class="nav-item dropdown no-arrow">
                     <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
-                        <span
-                            class="mr-2 d-none d-lg-inline text-gray-600 small"><?php echo htmlspecialchars($_SESSION['user_name']); ?>
+                        <span class="mr-2 d-none text-gray-600 small d-flex flex-column">
+                            <b><?php echo htmlspecialchars($_SESSION['user_name']); ?></b>
+                            <small><?php echo htmlspecialchars($_SESSION['user_access_level']); ?></small>
                         </span>
                         <?php if ($user_role == 'Member'): ?>
                             <span class="notification-icon position-relative pc-head-link"
