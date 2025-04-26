@@ -11,10 +11,11 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // fetch
-$sql = "SELECT s.savings_id, s.email, u.member_name, s.reference, s.amount_saved, s.created_at
-          FROM savings s
-          JOIN members u ON s.user_id = u.user_id
-          ORDER BY s.created_at DESC";
+$sql = "SELECT 
+    s.user_id, u.member_name, s.email, s.reference, s.created_at, SUM(s.amount_saved) AS total_savings
+FROM savings s JOIN members u ON s.user_id = u.user_id
+GROUP BY s.user_id, u.member_name, s.email
+ORDER BY total_savings DESC";
 $result = $mysqli -> query($sql);
 $savings = array();
 if($result -> num_rows > 0){
@@ -23,46 +24,9 @@ if($result -> num_rows > 0){
     }
 }
 
-// fetch shares
-$sql2 = "SELECT s.id, u.member_name, s.share_amount, s.purchase_date 
-          FROM shares s
-          JOIN members u ON s.user_id = u.user_id
-          ORDER BY s.purchase_date DESC";
-$result = $mysqli -> query($sql2);
-$shares = array();
-if($result -> num_rows > 0){
-    while($row = $result -> fetch_assoc()){
-       $shares[] = $row;
-    }
-}
 
 $user_id = $_SESSION['user_id'];
-// // Fetch member's savings
-// $savings_query = "SELECT SUM(amount) AS total_savings FROM savings WHERE user_id = ?";
-// $stmt = $mysqli->prepare($savings_query);
-// $stmt->bind_param("i", $user_id);
-// $stmt->execute();
-// $stmt->bind_result($total_savings);
-// $stmt->fetch();
-// $stmt->close();
 
-// Fetch member's shares
-$shares_query = "SELECT SUM(share_amount) AS total_shares FROM shares WHERE user_id = ?";
-$stmt = $mysqli->prepare($shares_query);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($total_shares);
-$stmt->fetch();
-$stmt->close();
-
-// Fetch member's dividends
-$dividends_query = "SELECT SUM(dividend_amount) AS total_dividends FROM dividends WHERE user_id = ?";
-$stmt = $mysqli->prepare($dividends_query);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$stmt->bind_result($total_dividends);
-$stmt->fetch();
-$stmt->close();
 
 ?>
 
@@ -81,36 +45,13 @@ $stmt->close();
             <div class="level">
 
                 <?php if ($user_role == 'System Administrator') : ?>
-                    <div class="row mb-4">
-                                <div class="col-xl-6 col-md-4 mb-4">
-                                    <a href="#" class="btn btn-primary btn-icon-split"
-                                        onclick="showSection('loanapplication')">
-                                        <span class="icon text-white-50">
-                                            <i class="fa fa-pencil-square" aria-hidden="true"></i>
-                                        </span>
-                                        <span class="text">Savings</span>
-                                    </a>
-                                </div>
-                                <div class="col-xl-6 col-md-6 mb-4">
-                                    <a href="#" class="btn btn-primary btn-icon-split"
-                                        onclick="showSection('loanstatus')">
-                                        <span class="icon text-white-50">
-                                            <i class="fa fa-eye"></i>
-                                        </span>
-                                        <span class="text">Shares</span>
-                                    </a>
-                                </div>
-                            </div>
-
-                    </div>
                     <div class="row">
                         <div class="col-lg-12">
                          <div id="loanapplication" class="content-section">
                             <div class="card card-yellow card-outline">
                                 <div class="card-header">
                                     <div class="d-sm-flex align-items-center justify-content-between mb-0">
-                                        <h5 class="card-title m-0">Savings</h5>
-                                        <a href="#addsavings" data-toggle="modal" style="text-decoration:none;" class="d-none d-sm-inline-block shadow-sm"><button type="button" class="btn btn-block btn-primary">Add new savings</button></a>
+                                        <h5 class="card-title m-0">Member Savings</h5>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -139,7 +80,7 @@ $stmt->close();
                                                         </td>
                                                         <td><?php echo htmlspecialchars($saving['reference']); ?>
                                                         </td>
-                                                        <td><?php echo htmlspecialchars($saving['amount_saved']); ?>
+                                                        <td><?php echo htmlspecialchars($saving['total_savings']); ?>
                                                         </td>
                                                         <td><?php echo htmlspecialchars($saving['created_at']); ?>
                                                         </td>
@@ -161,7 +102,7 @@ $stmt->close();
                          </div>
                         </div>
                     </div>
-                    <div class="row">
+                    <!-- <div class="row">
                         <div class="col-lg-12">
                          <div id="loanstatus" class="content-section" style="display: none;">
                             <div class="card card-yellow card-outline">
@@ -175,7 +116,6 @@ $stmt->close();
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-lg-12 table-responsive">
-                                            <!-- table -->
                                             <table class="table table-bordered" id="datatable">
                                                 <thead>
                                                     <tr>
@@ -212,7 +152,7 @@ $stmt->close();
                             </div>
                          </div>
                         </div>
-                    </div>
+                    </div> -->
 
                 <?php elseif ($user_role == 'Member') : ?>
                     <!-- Main content -->

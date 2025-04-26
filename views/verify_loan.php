@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt_email->close();
 
     // Fetch total savings
-    $stmt_savings = $mysqli->prepare("SELECT COALESCE(SUM(amount), 0) FROM savings WHERE user_id = ?");
+    $stmt_savings = $mysqli->prepare("SELECT COALESCE(SUM(amount_saved), 0) FROM savings WHERE user_id = ?");
     $stmt_savings->bind_param("i", $user_id);
     $stmt_savings->execute();
     $stmt_savings->bind_result($member_savings);

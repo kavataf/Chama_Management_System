@@ -36,6 +36,16 @@ if ($result->num_rows > 0) {
     }
 }
 
+// Fetch loan products
+$products = [];
+$result = $mysqli->query("SELECT product_id, loan_name, loan_duration, loan_interest, maximum_limit, loan_description 
+FROM products");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $products[] = $row;
+    }
+}
+
 // fetch repayments
 $sql = "SELECT loan_name, amount_paid, repayment_date FROM repayments WHERE user_id = ?";
 $stmt = $mysqli->prepare($sql);
@@ -135,14 +145,41 @@ if ($result->num_rows > 0) {
                                 <fieldset class="border p-2 border-success">
                                     <legend class="w-auto text-success">Loan / Personal Details</legend>
                                     <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                            <label for="">Loan Amount<span class="text-danger">*</span></label>
-                                            <input type="number" placeholder="" required name="loan_amount" class="form-control">
+                                    <div class="form-group col-md-6">
+                                        <label for="">Loan Name<span class="text-danger">*</span></label>
+                                        <div class="d-flex align-items-center">
+                                            <select required name="loan_name" id="loan_name" class="form-control" onchange="fetchLoanDetails()">
+                                                <option value="">-- Select Loan Product --</option>
+                                                <?php foreach ($products as $product): ?>
+                                                    <option value="<?php echo htmlspecialchars($product['loan_name']); ?>">
+                                                        <?php echo htmlspecialchars($product['loan_name']); ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                            <div id="loadingSpinner" style="display: none; margin-left: 10px;">
+                                                <div class="spinner-border text-primary spinner-border-sm" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
                                         </div>
+                                    </div>
+
                                         <div class="form-group col-md-6">
                                             <label for="">Loan Duration<span class="text-danger">*</span></label>
-                                            <input type="text" placeholder="" required name="loan_duration"
-                                                class="form-control">
+                                            <input type="text" placeholder="" required name="loan_duration" id="loan_duration" class="form-control" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <!-- Loan Amount (editable) -->
+                                        <div class="form-group col-md-6">
+                                            <label for="loan_amount">Loan Amount (Months)<span class="text-danger">*</span></label>
+                                            <input type="number" required name="loan_amount" id="loan_amount" class="form-control">
+                                        </div>
+
+                                        <!-- Interest Rate (readonly) -->
+                                        <div class="form-group col-md-6">
+                                            <label for="loan_interest">Interest Rate (%)<span class="text-danger">*</span></label>
+                                            <input type="text" name="loan_interest" id="loan_interest" class="form-control" readonly>
                                         </div>
                                     </div>
                                     <div class="form-row">
@@ -151,19 +188,11 @@ if ($result->num_rows > 0) {
                                             <input type="date" placeholder="" required name="application_date"
                                                 class="form-control">
                                         </div>
-                                        <div class="form-group col-md-6">
-                                            <label for="">Loan Name<span class="text-danger">*</span></label>
-                                            <input type="text" placeholder="" required name="loan_name"
-                                                class="form-control">
-                                        </div>
-
-                                        
+                        
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-6">
-                                            <label for="">Loan Purpose<span class="text-danger">*</span></label>
-                                            <textarea placeholder="" required name="loan_purpose" class="form-control"></textarea>
-                                        </div>
+                                    <div class="form-group col-md-8">
+                                        <label for="loan_purpose">Loan Purpose<span class="text-danger">*</span></label>
+                                        <textarea required name="loan_purpose" id="loan_purpose" class="form-control"></textarea>
                                     </div>
                                 </fieldset>
                                 <div class="modal-footer">
@@ -176,6 +205,56 @@ if ($result->num_rows > 0) {
 
 
                             </form>
+
+                            <script>
+                                function fetchLoanDetails() {
+                                    const loanSelect = document.getElementById('loan_name');
+                                    const selectedLoan = loanSelect.value;
+                                    const spinner = document.getElementById('loadingSpinner');
+
+                                    if (!selectedLoan) {
+                                        clearLoanFields();
+                                        return;
+                                    }
+
+                                    spinner.style.display = 'inline-block'; // SHOW spinner
+
+                                    fetch(`get_loan_details.php?loan_name=${encodeURIComponent(selectedLoan)}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            spinner.style.display = 'none'; // HIDE spinner
+
+                                            if (data.status === 'success') {
+                                                const loan = data.data;
+
+                                                document.getElementById('loan_duration').value = loan.loan_duration || '';
+                                                document.getElementById('loan_interest').value = loan.loan_interest || '';
+                                                document.getElementById('loan_amount').value = loan.maximum_limit || '';
+                                                document.getElementById('loan_purpose').value = loan.loan_description || '';
+                                            } else {
+                                                alert('Loan details could not be fetched.');
+                                                clearLoanFields();
+                                            }
+                                        })
+                                        .catch(error => {
+                                            spinner.style.display = 'none'; // HIDE spinner
+                                            console.error('Error fetching loan details:', error);
+                                            alert('Something went wrong. Try again.');
+                                            clearLoanFields();
+                                        });
+                                }
+
+                                function clearLoanFields() {
+                                    document.getElementById('loan_duration').value = '';
+                                    document.getElementById('loan_interest').value = '';
+                                    document.getElementById('loan_amount').value = '';
+                                    document.getElementById('loan_purpose').value = '';
+                                }
+                            </script>
+
+
+
+
                             <?php endif; ?>
                             <?php require_once('../helpers/applications.php');?>
                             </div>
