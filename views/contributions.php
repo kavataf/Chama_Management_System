@@ -131,7 +131,7 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                          </div>
                          <div class="row">
                           <div class="col-xl-12">
-                            <div id="viewcontribution" class="content-section">
+                            <div id="viewcontribution" class="content-section" style="display: none;">
                             <!-- Contributions Table -->
                             <table class="table table-bordered">
                                 <thead>
@@ -222,7 +222,7 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                          </div>
                          <div class="row">
                           <div class="col-xl-12">
-                            <div id="paidcontribution" class="content-section">
+                            <div id="paidcontribution" class="content-section" style="display: none;">
                             <!-- Display Already Contributed -->
                             <h4 class="mt-4">Already Contributed</h4>
                             <table class="table table-bordered">

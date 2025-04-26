@@ -91,7 +91,7 @@ if($dividends_result -> num_rows > 0){
 
                             <div class="row">
                                 <div class="col-xl-12">
-                                <div id="loanstatus" class="content-section">
+                                <div id="loanstatus" class="content-section" style="display: none;">
                                     <h3>All Members' Dividends</h3>
                                         <table class="table table-bordered" id="datatable">
                                                     <thead>

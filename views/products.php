@@ -41,6 +41,29 @@ if ($result->num_rows > 0) {
     }
 }
 
+$sql = "SELECT a.user_id, a.loan_name, a.loan_status, a.loan_purpose, a.loan_amount, a.loan_duration,
+       IFNULL(p.loan_interest, 0) AS interest,
+       IFNULL(p.processing_fee, 0) AS processing_fee,
+       IFNULL(p.loan_penalty, 0) AS penalty,
+       (a.loan_amount + (a.loan_amount * p.loan_interest / 100) + p.processing_fee + IFNULL(p.loan_penalty, 0)) AS total_to_repay,
+       a.application_date
+FROM applications a
+LEFT JOIN products p ON a.loan_id = p.loan_id
+WHERE a.user_id = ? 
+ORDER BY application_date DESC";
+
+$stmt = $mysqli->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$loans = array();
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $loans[] = $row;
+    }
+}
+
 
 
 
@@ -164,7 +187,7 @@ if ($result->num_rows > 0) {
                             <div class="card card-yellow card-outline">
                                 <div class="card-header">
                                     <div class="d-sm-flex align-items-center justify-content-between mb-0">
-                                        <h5 class="card-title m-0">My Products</h5>
+                                        <h5 class="card-title m-0">Loan products</h5>
                                     </div>
                                 </div>
                                 <div class="card-body">
@@ -176,29 +199,26 @@ if ($result->num_rows > 0) {
                                                     <tr>
                                                         <th style="width: 10px">No</th>
                                                         <th>Loan Name</th>
-                                                        <th>Loan Amount</th>
-                                                        <th>Loan Duration</th>
-                                                        <th>Loan Status</th>
-                                                        <th>Loan Purpose</th>
-                                                        <th>Total Amount</th>
+                                                        <th>Maximum Amount</th>
+                                                        <th>Loan Interest</th>
+                                                        <th>Loan Duration (months)</th>
+                                                        <th>Guarantors</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <?php if (!empty($member_products)) : ?>
-                                                    <?php foreach ($member_products as $key => $member_product) : ?>
+                                                    <?php if (!empty($products)) : ?>
+                                                    <?php foreach ($products as $key => $product) : ?>
                                                     <tr>
                                                         <td><?php echo ($key + 1); ?></td>
-                                                        <td><?php echo htmlspecialchars($member_product['loan_name']); ?>
+                                                        <td><?php echo htmlspecialchars($product['loan_name']); ?>
                                                         </td>
-                                                        <td><?php echo htmlspecialchars($member_product['loan_amount']); ?>
+                                                        <td><?php echo htmlspecialchars($product['maximum_limit']); ?>
                                                         </td>
-                                                        <td><?php echo htmlspecialchars($member_product['loan_duration']); ?>
+                                                        <td><?php echo htmlspecialchars($product['loan_interest']); ?>
                                                         </td>
-                                                        <td><?php echo htmlspecialchars($member_product['loan_status']); ?>
+                                                        <td><?php echo htmlspecialchars($product['loan_duration']); ?>
                                                         </td>
-                                                        <td><?php echo htmlspecialchars($member_product['loan_purpose']); ?>
-                                                        </td>
-                                                        <td><?php echo number_format(htmlspecialchars($member_product['total_to_repay']), 2); ?>
+                                                        <td><?php echo htmlspecialchars($product['loan_guarantors']); ?>
                                                         </td>
                                                     </tr>
                                                     <?php endforeach; ?>

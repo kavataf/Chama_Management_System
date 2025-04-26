@@ -26,7 +26,7 @@ if($result -> num_rows > 0){
 
 $user_id = $_SESSION['user_id'];
 
-$sql2 = "SELECT SUM(amount) AS amount, user_id
+$sql2 = "SELECT SUM(amount_saved) AS amount, user_id
 FROM savings 
 WHERE user_id = ?";
 

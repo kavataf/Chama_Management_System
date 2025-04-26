@@ -33,39 +33,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <body class="hold-transition login-page" style="background-image: url('../public/img/bg.jpg'); background-size: cover;">
-    <div class="container login-box">
-        <h3 class="text-dark mt-5">Two-Step Verification</h3>
-        <p>We sent a code to your email. Please enter it below.</p>
-        <?php if (isset($_SESSION['message'])): ?>
-            <div class="success"><?= htmlspecialchars($_SESSION['message']) ?></div>
-            <?php unset($_SESSION['message']); ?>
-        <?php endif; ?>
-        <?php if (isset($_SESSION['error'])): ?>
-            <div class="error"><?= htmlspecialchars($_SESSION['error']) ?></div>
-            <?php unset($_SESSION['error']); ?>
-        <?php endif; ?>
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="login-box">
+            <div class="card">
+                <div class="card-body login-card-body">
+                    <h3 class="text-dark mt-5">Two-Step Verification</h3>
+                    <p>We sent a code to your email. Please enter it below.</p>
+                    <?php if (isset($_SESSION['message'])): ?>
+                        <div class="success"><?= htmlspecialchars($_SESSION['message']) ?></div>
+                        <?php unset($_SESSION['message']); ?>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['error'])): ?>
+                        <div class="error"><?= htmlspecialchars($_SESSION['error']) ?></div>
+                        <?php unset($_SESSION['error']); ?>
+                    <?php endif; ?>
 
-        <form method="post" style="width: 500px; margin: auto 20px;">
-            <div class="input-group mb-3">
-                <input type="text" name="auth_code" id="auth_code" required maxlength="6" placeholder="Enter code"
-                class="form-control">
+                    <form method="post" style="width: 500px; margin: auto 20px;">
+                        <div class="input-group mb-3">
+                            <input type="text" name="auth_code" id="auth_code" required maxlength="6" placeholder="Enter code"
+                                class="form-control">
+                        </div>
+                        <div class="row">
+                            <div class="col-8">
+                                <p class="mb-1">
+                                    <p id="countdown" style="font-weight: bold; color: #007bff;"></p>
+                                </p>
+                            </div>
+                            <!-- /.col -->
+                            <div class="col-4">
+                                <button type="submit" class="btn btn-primary mr-4">Verify</button> 
+                            </div>
+                            <!-- /.col -->
+                        </div>
+                    </form>
+                    <p><a href="resend-code.php">Didn't receive the code?</a></p>
+                </div>
             </div>
-            <div class="row">
-                        <div class="col-8">
-                        <p class="mb-1">
-                        <p id="countdown" style="font-weight: bold; color: #007bff;"></p>
-                        </p>
-                        </div>
-                        <!-- /.col -->
-                        <div class="col-4">
-                        <button type="submit" class="btn btn-primary mr-4">Verify</button> 
-                        </div>
-                        <!-- /.col -->
-                    </div>
-            
-        </form>
-        <p><a href="resend-code.php">Didn't receive the code?</a></p>
+        </div>
     </div>
+
 
     <script>
     const expiryTime = <?= $_SESSION['auth_code_created_at'] + 300 ?> * 1000; 

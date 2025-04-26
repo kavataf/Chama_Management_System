@@ -92,11 +92,8 @@ if ($result->num_rows > 0) {
             <!-- Main content  executive dashbord-->
             <div class="level">
 
-                <?php if ($user_role == 'System Administrator') : ?>
-                
-
                 <!-- Members Dashboard -->
-                <?php elseif ($user_role == 'Member') : ?>
+                <?php if ($user_role == 'Member') : ?>
                     <!-- Main content -->
                     <div class="content">
                             <div class="row mb-4">
@@ -171,7 +168,6 @@ if ($result->num_rows > 0) {
                                 </fieldset>
                                 <div class="modal-footer">
                                     <div class="text-right">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                         <button type="submit" name="apply_loan" class="btn btn-outline-primary">
                                             <i class="fas fa-save"></i> Save
                                         </button>
@@ -189,7 +185,7 @@ if ($result->num_rows > 0) {
                             <!-- loan status -->
                             <div class="row">
                             <div class="col-xl-12">
-                            <div id="loanstatus" class="content-section">
+                            <div id="loanstatus" class="content-section" style="display: none;">
                             <h3>My loan status.</h3>
                             <table id="datatable" class="table table-striped table-bordered">
                                 <thead>
@@ -225,7 +221,7 @@ if ($result->num_rows > 0) {
                             <!-- loan repayment -->
                             <div class="row">
                             <div class="col-xl-12">
-                            <div id="loanrepayment" class="content-section">
+                            <div id="loanrepayment" class="content-section" style="display: none;">
                             <h3>Repayment History.</h3>
                             <table id="datatable" class="table table-striped table-bordered">
                                 <thead>
