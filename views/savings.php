@@ -51,7 +51,11 @@ $user_id = $_SESSION['user_id'];
                             <div class="card card-yellow card-outline">
                                 <div class="card-header">
                                     <div class="d-sm-flex align-items-center justify-content-between mb-0">
-                                        <h5 class="card-title m-0">Member Savings</h5>
+                                        <h5 class="card-title m-0">Member Savings</h5><div class="text-right">
+                                            <a href="../reports/pdf/savings.php" class="btn btn-info m-2">
+                                                <i class="fas fa-file-pdf"></i> Generate Report
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="card-body">

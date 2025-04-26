@@ -100,7 +100,7 @@ $html =
                         <h3>
                             <img  src="'.$base64.'" style="width:50%" alt="Logo">  <br>
                             <hr style="width:100%" , color=black><br>
-                            List of all products <br>
+                            List of all Loan products <br>
                         </h3>                        
                     </div>
                     <table border="1" cellspacing="0" width="100%" style="font-size:9pt">
@@ -108,13 +108,10 @@ $html =
                             <tr>
                                 <th style="width:10%">S/N</th>
                                 <th style="width:100%">Loan name</th>
-                                <th style="width:50%">Loan interest</th>
-                                <th style="width:50%">Loan duration</th>
-                                <th style="width:100%">Processing fee</th>
+                                <th style="width:50%">Loan interest (%)</th>
+                                <th style="width:50%">Loan duration (Months)</th>
                                 <th style="width:80%">Maximum limit</th>
                                 <th style="width:60%">Loan guarantors</th>
-                                <th style="width:100%">Member savings</th>
-                                <th style="width:60%">Loan penalty</th>
                                 <th style="width:100%">Loan description</th>
                             </tr>
                         </thead>
@@ -133,11 +130,8 @@ $html =
                                         $html .= '<td>' . $row['loan_name'] . '</td>';
                                         $html .= '<td>' . $row['loan_interest'] . '</td>';
                                         $html .= '<td>' . $row['loan_duration'] . '</td>';
-                                        $html .= '<td>' . $row['processing_fee'] . '</td>';
-                                        $html .= '<td>' . $row['maximum_limit'] . '</td>';
+                                        $html .= '<td>Ksh' . number_format($row['maximum_limit'], 2) . '</td>';
                                         $html .= '<td>' . $row['loan_guarantors'] . '</td>';
-                                        $html .= '<td>' . $row['member_savings'] . '</td>';
-                                        $html .= '<td>' . $row['loan_penalty'] . '</td>';
                                         $html .= '<td>' . $row['loan_description'] . '</td>';
                                         $html .= '</tr>';
                                         $count++;
@@ -158,7 +152,7 @@ $dompdf->load_html($html);
 $dompdf->set_paper('A4', 'landscape');
 $dompdf->set_option('isHtml5ParserEnabled', true);
 $dompdf->render();
-$dompdf->stream('List of all products ' . date('d M Y, g:ia'), array("Attachment" => 1));
+$dompdf->stream('List of all loan products ' . date('d M Y, g:ia'), array("Attachment" => 1));
 $options = $dompdf->getOptions();
 $options->setDefaultFont('');
 $dompdf->setOptions($options);

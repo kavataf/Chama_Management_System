@@ -80,8 +80,13 @@ if($result -> num_rows > 0){
                         <div class="col-md-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="mb-0">Members</h5>
-                                <a href="#addmember" data-toggle="modal" style="text-decoration:none;" class="d-none d-sm-inline-block shadow-sm">
-                                <button class="btn btn-primary btn-sm">+ Add Member</button> </a>
+                                <div class="d-flex">
+                                    <a href="#addmember" data-toggle="modal" style="text-decoration:none;" class="d-none d-sm-inline-block shadow-sm">
+                                    <button class="btn btn-primary btn-sm">+ Add Member</button> </a>
+                                    <a href="../reports/pdf/members.php" class="btn btn-info btn-sm shadow-sm ml-2">
+                                        <i class="fas fa-download"></i> 
+                                    </a>
+                                </div>
                             </div>
                             <input class="form-control mb-2" placeholder="Search members...">
                             <ul class="list-group member-list" id="memberList">

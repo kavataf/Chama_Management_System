@@ -100,19 +100,16 @@ $html =
                         <h3>
                             <img  src="'.$base64.'" style="width:50%" alt="Logo">  <br>
                             <hr style="width:100%" , color=black><br>
-                            List of all member contributions <br>
+                            List of all contributions <br>
                         </h3>                        
                     </div>
                     <table border="1" cellspacing="0" width="100%" style="font-size:9pt">
                         <thead>
                             <tr>
                                 <th style="width:10%">S/N</th>
-                                <th style="width:100%">Member name</th>
-                                <th style="width:50%">Gender</th>
-                                <th style="width:50%">ID No.</th>
-                                <th style="width:100%">Phone</th>
-                                <th style="width:100%">Email</th>
-                                <th style="width:100%">Amount</th>
+                                <th style="width:100%">Title</th>
+                                <th style="width:50%">Amount</th>
+                                <th style="width:50%">Due Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -129,12 +126,9 @@ $html =
                                         $html .= '<tr>';
                                         // Output each column value in a table cell
                                         $html .= '<td>' . $count . '</td>';
-                                        $html .= '<td>' . $row['member_name'] . '</td>';
-                                        $html .= '<td>' . $row['member_gender'] . '</td>';
-                                        $html .= '<td>' . $row['member_id_no'] . '</td>';
-                                        $html .= '<td>' . $row['member_phone'] . '</td>';
-                                        $html .= '<td>' . $row['member_email'] . '</td>';
-                                        $html .= '<td>' . $row['contribution_amount'] . '</td>';
+                                        $html .= '<td>' . $row['title'] . '</td>';
+                                        $html .= '<td>Ksh' . number_format($row['amount'], 2) . '</td>';
+                                        $html .= '<td>' . $row['due_date'] . '</td>';
                                         $html .= '</tr>';
                                         $count++;
                                     }
@@ -154,7 +148,7 @@ $dompdf->load_html($html);
 $dompdf->set_paper('A4', 'landscape');
 $dompdf->set_option('isHtml5ParserEnabled', true);
 $dompdf->render();
-$dompdf->stream('List of all member contributions ' . date('d M Y, g:ia'), array("Attachment" => 1));
+$dompdf->stream('List of all contributions ' . date('d M Y, g:ia'), array("Attachment" => 1));
 $options = $dompdf->getOptions();
 $options->setDefaultFont('');
 $dompdf->setOptions($options);

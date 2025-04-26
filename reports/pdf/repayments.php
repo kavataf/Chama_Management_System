@@ -98,9 +98,8 @@ $html =
                     </div> 
                     <div class="list_header" align="center">
                         <h3>
-                            <img  src="'.$base64.'" style="width:50%" alt="Logo">  <br>
                             <hr style="width:100%" , color=black><br>
-                            List of all member loan applications <br>
+                            List of all loan repayments <br>
                         </h3>                        
                     </div>
                     <table border="1" cellspacing="0" width="100%" style="font-size:9pt">
@@ -108,22 +107,22 @@ $html =
                             <tr>
                                 <th style="width:10%">S/N</th>
                                 <th style="width:100%">Member name</th>
-                                <th style="width:100%">Loan name</th>
+                                <th style="width:50%">Loan name</th>
                                 <th style="width:50%">Loan amount</th>
-                                <th style="width:50%">Loan duration (Months)</th>
-                                <th style="width:100%">Loan status</th>
-                                <th style="width:100%">Application date</th>
+                                <th style="width:50%">Amount paid</th>
+                                <th style="width:50%">Due date</th>
+                                <th style="width:50%">repayment date</th>
+                                <th style="width:50%">status</th>
                             </tr>
                         </thead>
                         <tbody>
                             ';
                                 $pdf_sql = mysqli_query(
                                     $mysqli,
-                                    "SELECT a.*, u.user_name
-                                    FROM applications a
-                                    JOIN users u
-                                    WHERE u.user_id = a.user_id
-                                "
+                                    "SELECT u.user_name, r.loan_name,r.loan_amount, 
+                                    r.amount_paid, r.due_date, r.status, r.repayment_date
+                                    FROM repayments r
+                                     JOIN users u WHERE u.user_id = r.user_id"
                                 );
                                 if (mysqli_num_rows($pdf_sql) > 0) {
                                     $count = 1;
@@ -134,9 +133,10 @@ $html =
                                         $html .= '<td>' . $row['user_name'] . '</td>';
                                         $html .= '<td>' . $row['loan_name'] . '</td>';
                                         $html .= '<td>Ksh' . number_format($row['loan_amount'], 2) . '</td>';
-                                        $html .= '<td>' . $row['loan_duration'] . '</td>';
-                                        $html .= '<td>' . $row['loan_status'] . '</td>';
-                                        $html .= '<td>' . $row['application_date'] . '</td>';
+                                        $html .= '<td>Ksh' . number_format($row['amount_paid'], 2) . '</td>';
+                                        $html .= '<td>' . $row['due_date'] . '</td>';
+                                        $html .= '<td>' . $row['repayment_date'] . '</td>';
+                                        $html .= '<td>' . $row['status'] . '</td>';
                                         $html .= '</tr>';
                                         $count++;
                                     }
@@ -156,7 +156,7 @@ $dompdf->load_html($html);
 $dompdf->set_paper('A4', 'landscape');
 $dompdf->set_option('isHtml5ParserEnabled', true);
 $dompdf->render();
-$dompdf->stream('List of all loan applications ' . date('d M Y, g:ia'), array("Attachment" => 1));
+$dompdf->stream('List of all loan repayments ' . date('d M Y, g:ia'), array("Attachment" => 1));
 $options = $dompdf->getOptions();
 $options->setDefaultFont('');
 $dompdf->setOptions($options);

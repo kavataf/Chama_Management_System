@@ -98,7 +98,6 @@ $html =
                     </div> 
                     <div class="list_header" align="center">
                         <h3>
-                            <img  src="'.$base64.'" style="width:50%" alt="Logo">  <br>
                             <hr style="width:100%" , color=black><br>
                             List of all member savings <br>
                         </h3>                        
@@ -108,20 +107,20 @@ $html =
                             <tr>
                                 <th style="width:10%">S/N</th>
                                 <th style="width:100%">Member name</th>
+                                <th style="width:100%">Email</th>
                                 <th style="width:50%">Reference No.</th>
-                                <th style="width:50%">Amount</th>
                                 <th style="width:80%">Savings date</th>
-                                <th style="width:80%">Payment method</th>
+                                <th style="width:50%">Total savings</th>
                             </tr>
                         </thead>
                         <tbody>
                             ';
                                 $pdf_sql = mysqli_query(
                                     $mysqli,
-                                    "SELECT u.user_name, s.reference_no, s.amount, s.savings_date, s.payment_method 
-                                    FROM savings s
-                                    JOIN users u ON s.user_id = u.user_id
-                                    ORDER BY s.savings_date DESC"
+                                    "SELECT s.user_id, u.member_name, s.email, s.reference, s.created_at, SUM(s.amount_saved) AS total_savings
+                                    FROM savings s JOIN members u ON s.user_id = u.user_id
+                                    GROUP BY s.user_id, u.member_name, s.email
+                                    ORDER BY total_savings DESC"
                                 );
                                 if (mysqli_num_rows($pdf_sql) > 0) {
                                     $count = 1;
@@ -129,11 +128,11 @@ $html =
                                         $html .= '<tr>';
                                         // Output each column value in a table cell
                                         $html .= '<td>' . $count . '</td>';
-                                        $html .= '<td>' . $row['user_name'] . '</td>';
-                                        $html .= '<td>' . $row['reference_no'] . '</td>';
-                                        $html .= '<td>' . $row['amount'] . '</td>';
-                                        $html .= '<td>' . $row['savings_date'] . '</td>';
-                                        $html .= '<td>' . $row['payment_method'] . '</td>';
+                                        $html .= '<td>' . $row['member_name'] . '</td>';
+                                        $html .= '<td>' . $row['email'] . '</td>';
+                                        $html .= '<td>' . $row['reference'] . '</td>';
+                                        $html .= '<td>' . $row['created_at'] . '</td>';
+                                        $html .= '<td>Ksh ' . number_format($row['total_savings'], 2) . '</td>';
                                         $html .= '</tr>';
                                         $count++;
                                     }

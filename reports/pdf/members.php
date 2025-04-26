@@ -98,7 +98,7 @@ $html =
                     </div> 
                     <div class="list_header" align="center">
                         <h3>
-                            <img  src="'.$base64.'" style="width:50%" alt="Logo">  <br>
+                            <img  src="'.$base64.'" style="width:50%; height:80px;" alt="Logo">  <br>
                             <hr style="width:100%" , color=black><br>
                             List of all members <br>
                         </h3>                        
@@ -112,6 +112,8 @@ $html =
                                 <th style="width:50%">ID No.</th>
                                 <th style="width:100%">Phone</th>
                                 <th style="width:100%">Email</th>
+                                <th style="width:50%">Status</th>
+                                <th style="width:50%">Total savings</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -119,7 +121,7 @@ $html =
                                 $pdf_sql = mysqli_query(
                                     $mysqli,
                                     "SELECT c.member_name, c.member_gender, c.member_id_no, c.member_phone,
-                                   c.member_email 
+                                   c.member_email, c.member_status, c.total_savings
                                     FROM members c
                                 "
                                 );
@@ -134,6 +136,8 @@ $html =
                                         $html .= '<td>' . $row['member_id_no'] . '</td>';
                                         $html .= '<td>' . $row['member_phone'] . '</td>';
                                         $html .= '<td>' . $row['member_email'] . '</td>';
+                                        $html .= '<td>' . $row['member_status'] . '</td>';
+                                        $html .= '<td>Ksh' . number_format($row['total_savings'], 2) . '</td>';
                                         $html .= '</tr>';
                                         $count++;
                                     }

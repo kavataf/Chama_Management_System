@@ -131,30 +131,42 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                          </div>
                          <div class="row">
                           <div class="col-xl-12">
-                            <div id="viewcontribution" class="content-section" style="display: none;">
-                            <!-- Contributions Table -->
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Amount</th>
-                                        <th>Due Date</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php while ($row = mysqli_fetch_assoc($contributions)) { ?>
-                                        <tr>
-                                            <td><?php echo $row['title']; ?></td>
-                                            <td><?php echo $row['amount']; ?></td>
-                                            <td><?php echo $row['due_date']; ?></td>
-                                            <td>
-                                                <a href="view_contributions.php?id=<?php echo $row['contribution_id']; ?>" class="btn btn-success">View</a>
-                                            </td>
-                                        </tr>
-                                    <?php } ?>
-                                </tbody>
-                            </table>
+                            <div id="viewcontribution" class="content-section card card-yellow card-outline" style="display: none;">
+                                <div class="card-header">
+                                    <div class="d-sm-flex align-items-center justify-content-between mb-0">
+                                        <h5 class="card-title m-0">All Contributions</h5>
+                                        <div class="text-right">
+                                            <a href="../reports/pdf/contributions.php" class="btn btn-info m-2">
+                                                <i class="fas fa-file-pdf"></i> Generate Report
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Contributions Table -->
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Title</th>
+                                                <th>Amount</th>
+                                                <th>Due Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php while ($row = mysqli_fetch_assoc($contributions)) { ?>
+                                                <tr>
+                                                    <td><?php echo $row['title']; ?></td>
+                                                    <td><?php echo $row['amount']; ?></td>
+                                                    <td><?php echo $row['due_date']; ?></td>
+                                                    <td>
+                                                        <a href="view_contributions.php?id=<?php echo $row['contribution_id']; ?>" class="btn btn-success">View</a>
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                            </div>
                           </div>

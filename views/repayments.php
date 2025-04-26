@@ -85,7 +85,11 @@ if ($user_role == 'System Administrator') {
                                 <div class="card-header">
                                     <div class="d-sm-flex align-items-center justify-content-between mb-0">
                                         <h5 class="card-title m-0">All Loan Repayments</h5>
-                                        <a href="#addrepayment" data-toggle="modal" style="text-decoration:none;" class="d-none d-sm-inline-block shadow-sm"><button type="button" class="btn btn-block btn-primary">Add loan repayment</button></a>
+                                        <div class="d-flex">
+                                            <a href="../reports/pdf/repayments.php" class="btn btn-info btn-sm shadow-sm">
+                                                <i class="fas fa-file-pdf"></i> Generate Report
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="card-body">

@@ -100,29 +100,24 @@ $html =
                         <h3>
                             <img  src="'.$base64.'" style="width:50%" alt="Logo">  <br>
                             <hr style="width:100%" , color=black><br>
-                            List of all member loan applications <br>
+                            List of all member contributions <br>
                         </h3>                        
                     </div>
                     <table border="1" cellspacing="0" width="100%" style="font-size:9pt">
                         <thead>
                             <tr>
                                 <th style="width:10%">S/N</th>
-                                <th style="width:100%">Member name</th>
-                                <th style="width:100%">Loan name</th>
-                                <th style="width:50%">Loan amount</th>
-                                <th style="width:50%">Loan duration (Months)</th>
-                                <th style="width:100%">Loan status</th>
-                                <th style="width:100%">Application date</th>
+                                <th style="width:100%">Title</th>
+                                <th style="width:50%">Amount</th>
+                                <th style="width:50%">Due Date</th>
                             </tr>
                         </thead>
                         <tbody>
                             ';
                                 $pdf_sql = mysqli_query(
                                     $mysqli,
-                                    "SELECT a.*, u.user_name
-                                    FROM applications a
-                                    JOIN users u
-                                    WHERE u.user_id = a.user_id
+                                    "SELECT c.*
+                                    FROM contributions c
                                 "
                                 );
                                 if (mysqli_num_rows($pdf_sql) > 0) {
@@ -131,12 +126,9 @@ $html =
                                         $html .= '<tr>';
                                         // Output each column value in a table cell
                                         $html .= '<td>' . $count . '</td>';
-                                        $html .= '<td>' . $row['user_name'] . '</td>';
-                                        $html .= '<td>' . $row['loan_name'] . '</td>';
-                                        $html .= '<td>Ksh' . number_format($row['loan_amount'], 2) . '</td>';
-                                        $html .= '<td>' . $row['loan_duration'] . '</td>';
-                                        $html .= '<td>' . $row['loan_status'] . '</td>';
-                                        $html .= '<td>' . $row['application_date'] . '</td>';
+                                        $html .= '<td>' . $row['title'] . '</td>';
+                                        $html .= '<td>Ksh' . number_format($row['amount'], 2) . '</td>';
+                                        $html .= '<td>' . $row['due_date'] . '</td>';
                                         $html .= '</tr>';
                                         $count++;
                                     }
@@ -156,7 +148,7 @@ $dompdf->load_html($html);
 $dompdf->set_paper('A4', 'landscape');
 $dompdf->set_option('isHtml5ParserEnabled', true);
 $dompdf->render();
-$dompdf->stream('List of all loan applications ' . date('d M Y, g:ia'), array("Attachment" => 1));
+$dompdf->stream('List of all member contributions ' . date('d M Y, g:ia'), array("Attachment" => 1));
 $options = $dompdf->getOptions();
 $options->setDefaultFont('');
 $dompdf->setOptions($options);

@@ -93,13 +93,18 @@ if ($result->num_rows > 0) {
                 <?php if ($user_role == 'System Administrator') : ?>
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="card card-yellow card-outline">
-                                <div class="card-header">
-                                    <div class="d-sm-flex align-items-center justify-content-between mb-0">
-                                        <h5 class="card-title m-0">Products</h5>
-                                        <a href="#addproduct" data-toggle="modal" style="text-decoration:none;" class="d-none d-sm-inline-block shadow-sm"><button type="button" class="btn btn-block btn-primary">Add product</button></a>
-                                    </div>
+                        <div class="card card-yellow card-outline">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title m-0">Products</h5>
+                                <div class="d-flex">
+                                    <a href="#addproduct" data-toggle="modal" style="text-decoration:none;" class="btn btn-primary btn-sm mr-2 shadow-sm">
+                                        + Add Product
+                                    </a>
+                                    <a href="../reports/pdf/products.php" class="btn btn-info btn-sm shadow-sm">
+                                        <i class="fas fa-file-pdf"></i> Generate Report
+                                    </a>
                                 </div>
+                            </div>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-lg-12 table-responsive">

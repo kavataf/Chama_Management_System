@@ -72,40 +72,45 @@ $members_query = $query->get_result();
 
                 <?php if ($user_role == 'System Administrator') : ?>
                     <div class="container mt-4">
-                        <h2><?php echo $contrib['title']; ?> - Member Contributions</h2>
+                            <h2><?php echo $contrib['title']; ?> - Member Contributions</h2>
 
-                        <form method="GET">
-                        <input type="hidden" name="id" value="<?php echo $contribution_id; ?>">
-                            <label for="filter_status">Filter by Status:</label>
-                            <select name="filter_status" id="filter_status" class="form-control col-6">
-                                <option value="">-- Select Status --</option>
-                                <option value="Paid" <?php echo ($filter_status == 'Paid') ? 'selected' : ''; ?>>Paid</option>
-                                <option value="Partially Paid" <?php echo ($filter_status == 'Partially Paid') ? 'selected' : ''; ?>>Partially Paid</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary m-2">Filter</button>
+                            <form method="GET">
+                            <input type="hidden" name="id" value="<?php echo $contribution_id; ?>">
+                                <label for="filter_status">Filter by Status:</label>
+                                <select name="filter_status" id="filter_status" class="form-control col-6">
+                                    <option value="">-- Select Status --</option>
+                                    <option value="Paid" <?php echo ($filter_status == 'Paid') ? 'selected' : ''; ?>>Paid</option>
+                                    <option value="Partially Paid" <?php echo ($filter_status == 'Partially Paid') ? 'selected' : ''; ?>>Partially Paid</option>
+                                </select>
+                                <button type="submit" class="btn btn-primary m-2">Filter</button>
 
-                             <!-- Reset Filter Button -->
-                                <a href="?id=<?php echo $contribution_id; ?>" class="btn btn-secondary m-2">Reset Filter</a>
-                        </form>
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Member Name</th>
-                                    <th>Amount Paid</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php while ($row = mysqli_fetch_assoc($members_query)) { ?>
+                                <!-- Reset Filter Button -->
+                                    <a href="?id=<?php echo $contribution_id; ?>" class="btn btn-secondary m-2">Reset Filter</a>
+                            </form>
+                            <table class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        <td><?php echo $row['member_name']; ?></td>
-                                        <td><?php echo $row['amount_paid']; ?></td>
-                                        <td><?php echo ucfirst($row['status']); ?></td>
+                                        <th>Member Name</th>
+                                        <th>Amount Paid</th>
+                                        <th>Status</th>
                                     </tr>
-                                <?php } ?>
-                            </tbody>
-                        </table>
-                        <a href="contributions.php" class="btn btn-success m-2">Back</a>
+                                </thead>
+                                <tbody>
+                                    <?php while ($row = mysqli_fetch_assoc($members_query)) { ?>
+                                        <tr>
+                                            <td><?php echo $row['member_name']; ?></td>
+                                            <td><?php echo $row['amount_paid']; ?></td>
+                                            <td><?php echo ucfirst($row['status']); ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                            <div class="text-right">
+                                <a href="contributions.php" class="btn btn-success m-2">Back</a>
+                                <a href="../reports/pdf/" class="btn btn-info m-2">
+                                    <i class="fas fa-save"></i> Generate Report
+                                </a>
+                            </div>
                     </div>
 
 

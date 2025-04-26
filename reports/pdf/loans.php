@@ -100,26 +100,30 @@ $html =
                         <h3>
                             <img  src="'.$base64.'" style="width:50%" alt="Logo">  <br>
                             <hr style="width:100%" , color=black><br>
-                            List of all expenses <br>
+                            List of all loan applications <br>
                         </h3>                        
                     </div>
                     <table border="1" cellspacing="0" width="100%" style="font-size:9pt">
                         <thead>
                             <tr>
                                 <th style="width:10%">S/N</th>
-                                <th style="width:100%">Vendor name</th>
-                                <th style="width:50%">Expense type</th>
-                                <th style="width:50%">Reference No.</th>
-                                <th style="width:100%">Expense amount</th>
+                                <th style="width:100%">Member name</th>
+                                <th style="width:50%">Loan name</th>
+                                <th style="width:50%">Loan amount</th>
+                                <th style="width:50%">Loan interest (5%)</th>
+                                <th style="width:50%">Loan duration (Months)</th>
+                                <th style="width:50%">Application date</th>
+                                <th style="width:50%">Loan status</th>
                             </tr>
                         </thead>
                         <tbody>
                             ';
                                 $pdf_sql = mysqli_query(
                                     $mysqli,
-                                    "SELECT e.*
-                                    FROM expenses e
-                                "
+                                    "SELECT a.*, u.user_name
+                                    FROM applications a
+                                    JOIN users u
+                                    WHERE u.user_id = a.user_id"
                                 );
                                 if (mysqli_num_rows($pdf_sql) > 0) {
                                     $count = 1;
@@ -127,10 +131,13 @@ $html =
                                         $html .= '<tr>';
                                         // Output each column value in a table cell
                                         $html .= '<td>' . $count . '</td>';
-                                        $html .= '<td>' . $row['vendor_name'] . '</td>';
-                                        $html .= '<td>' . $row['expense_type'] . '</td>';
-                                        $html .= '<td>' . $row['reference_no'] . '</td>';
-                                        $html .= '<td>' . $row['expense_amount'] . '</td>';
+                                        $html .= '<td>' . $row['user_name'] . '</td>';
+                                        $html .= '<td>' . $row['loan_name'] . '</td>';
+                                        $html .= '<td>Ksh' . number_format($row['loan_amount'], 2) . '</td>';
+                                        $html .= '<td>' . $row['loan_interest'] . '</td>';
+                                        $html .= '<td>' . $row['loan_duration'] . '</td>';
+                                        $html .= '<td>' . $row['application_date'] . '</td>';
+                                        $html .= '<td>' . $row['loan_status'] . '</td>';
                                         $html .= '</tr>';
                                         $count++;
                                     }
@@ -150,7 +157,7 @@ $dompdf->load_html($html);
 $dompdf->set_paper('A4', 'landscape');
 $dompdf->set_option('isHtml5ParserEnabled', true);
 $dompdf->render();
-$dompdf->stream('List of all expenses ' . date('d M Y, g:ia'), array("Attachment" => 1));
+$dompdf->stream('List of all loan applications ' . date('d M Y, g:ia'), array("Attachment" => 1));
 $options = $dompdf->getOptions();
 $options->setDefaultFont('');
 $dompdf->setOptions($options);
