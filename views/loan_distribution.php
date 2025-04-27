@@ -19,7 +19,7 @@ if($result -> num_rows > 0){
     }
 }
 
-$sql = "SELECT SUM(amount) AS savings_amount 
+$sql = "SELECT SUM(amount_saved) AS savings_amount 
 FROM savings";
 $result = $mysqli->query($sql);
 if($result -> num_rows > 0){

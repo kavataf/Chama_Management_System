@@ -88,7 +88,7 @@ if($result -> num_rows > 0){
                                     </a>
                                 </div>
                             </div>
-                            <input class="form-control mb-2" placeholder="Search members...">
+                            <input id="searchInput" class="form-control mb-2" placeholder="Search members...">
                             <ul class="list-group member-list" id="memberList">
                             <!-- JS will populate this -->
                             </ul>
@@ -129,33 +129,38 @@ if($result -> num_rows > 0){
     });
     </script>
 
-<script>
-  const members = <?php echo json_encode($members); ?>;
-  const loans = <?php echo json_encode($loans); ?>;
-</script>
 
 <script>
-    document.querySelector('input').addEventListener('input', function(e) {
-        const value = e.target.value.toLowerCase();
-        document.querySelectorAll('#memberList li').forEach(item => {
-            item.style.display = item.innerText.toLowerCase().includes(value) ? '' : 'none';
+    // Members and loans data from PHP
+    const members = <?php echo json_encode($members); ?>;
+    const loans = <?php echo json_encode($loans); ?>;
+
+    // Render member list
+    function renderMemberList(filter = '') {
+        const list = document.getElementById('memberList');
+        list.innerHTML = '';
+
+        members.forEach((member, index) => {
+            if (member.name.toLowerCase().includes(filter.toLowerCase())) {
+                const item = document.createElement('li');
+                item.className = 'list-group-item d-flex align-items-center';
+                item.style.cursor = 'pointer';
+                item.innerHTML = `
+                    <img src="../public/img/no-profile.png" class="rounded-circle me-2" width="40" height="40">
+                    <span class="ml-1">${member.name}</span>
+                `;
+                item.onclick = () => showDetails(index);
+                list.appendChild(item);
+            }
         });
-    });
-
-    function renderMemberList() {
-      const list = document.getElementById('memberList');
-      members.forEach((member, index) => {
-        const item = document.createElement('li');
-        item.className = 'list-group-item d-flex align-items-center';
-        item.innerHTML = `
-          <img src="${member.avatar}" class="rounded-circle me-2" width="40" height="40">
-          <span class="ml-1">${member.name}</span>
-        `;
-        item.onclick = () => showDetails(index);
-        list.appendChild(item);
-      });
     }
 
+    // Search filter
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        renderMemberList(e.target.value);
+    });
+
+    // Show member details
     function showDetails(index) {
         const m = members[index];
         const container = document.getElementById('memberDetails');
@@ -180,7 +185,7 @@ if($result -> num_rows > 0){
 
         container.innerHTML = `
             <div class="d-flex align-items-start mb-3">
-                <img src="${m.avatar}" class="rounded-circle me-3" width="60" height="60">
+                <img src="../public/img/no-profile.png" class="rounded-circle me-3" width="60" height="60">
                 <div class="d-flex flex-column">
                     <h5 class="mb-1 ml-2">${m.name}</h5>
                     <small class="text-muted mb-1 ml-2">@${m.email.split('@')[0]}</small>
@@ -228,16 +233,12 @@ if($result -> num_rows > 0){
                         <button class="btn btn-outline-primary w-100">Edit Member Info</button>
                     </a>
                 </div>
+                <div class="col-md-6 mb-2">
+                    <button class="btn btn-outline-warning w-100" onclick="setSuspendMember(${m.id})" data-toggle="modal" data-target="#suspendModal">
+                        Suspend
+                    </button>
+                </div>
 
-                <div class="col-md-6 mb-2">
-                    <button class="btn btn-outline-secondary w-100">View Contribution History</button>
-                </div>
-                <div class="col-md-6 mb-2">
-                    <button class="btn btn-outline-success w-100">Send Notification</button>
-                </div>
-                <div class="col-md-6 mb-2">
-                    <button class="btn btn-outline-warning w-100">Suspend / Reactivate</button>
-                </div>
                 <div class="col-12 mb-2">
                     <a href="#deleteModal" data-toggle="modal">
                         <button class="btn btn-outline-danger w-100">Delete Member</button>
@@ -247,9 +248,52 @@ if($result -> num_rows > 0){
         `;
     }
 
+    let selectedMemberId = null;
 
+
+function setSuspendMember(id) {
+    selectedMemberId = id;
+    console.log("Selected Member ID: " + selectedMemberId); 
+}
+
+// Ensure event listener is added when the modal opens
+$('#suspendModal').on('shown.bs.modal', function () {
+    // Attach the event listener to the OK button only when the modal is visible
+    document.querySelector('#suspendModal button[name="suspend_member"]').addEventListener('click', function() {
+        suspendMember();
+    });
+});
+
+function suspendMember() {
+    if (selectedMemberId) {
+        fetch('../helpers/suspend_member.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: selectedMemberId, action: 'suspend' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message); 
+            if (data.success) {
+                location.reload(); 
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    } else {
+        alert("No member selected!");
+    }
+}
+
+
+
+
+    // Loan status badge color
     function getStatusClass(status) {
-        switch(status.toLowerCase()) {
+        switch (status.toLowerCase()) {
             case 'approved': return 'bg-success text-white';
             case 'pending': return 'bg-warning text-dark';
             case 'rejected': return 'bg-danger text-white';
@@ -257,10 +301,23 @@ if($result -> num_rows > 0){
         }
     }
 
-
+    // Initial load
     renderMemberList();
 </script>
+
 <?php require_once("../modals/manage_member.php"); ?>
+
+<!-- Toast notification -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 1055">
+  <div id="successToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        Member suspended successfully!
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
 
 </body>
 

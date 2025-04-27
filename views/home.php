@@ -37,7 +37,7 @@ $stmt -> bind_result($amount, $fetched_user_id);
 $stmt -> fetch();
 $stmt -> close();
 
-$sql3 = "SELECT SUM(loan_amount) AS loan, user_id 
+$sql3 = "SELECT SUM(total_payable) AS loan, user_id 
 FROM applications WHERE user_id = ?";
 
 $stmt = $mysqli -> prepare($sql3);
@@ -47,7 +47,19 @@ $stmt -> bind_result($loan, $fetched_user_id);
 $stmt -> fetch();
 $stmt -> close();
 
-$sql4 = "SELECT COUNT(*) AS loan_applications FROM applications";
+$repayment = "SELECT SUM(amount_paid) AS Amount_repaid FROM repayments WHERE user_id = ?";
+
+$stmt = $mysqli -> prepare($repayment);
+$stmt -> bind_param("i", $user_id);
+$stmt -> execute();
+$stmt -> bind_result($Amount_repaid);
+$stmt -> fetch();
+$stmt -> close();
+
+// loan balance
+$Loan_balance = $loan - $Amount_repaid;
+
+$sql4 = "SELECT COUNT(*) AS loan_applications FROM applications WHERE loan_status = 'pending'";
 
 $result = $mysqli -> query($sql4);
 if($result -> num_rows > 0){
@@ -151,14 +163,6 @@ if($result -> num_rows > 0){
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
-            <!-- Page Heading -->
-            <!-- <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-                        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
-                    </div> -->
-
-
             <div></div>
             <!-- Content Header (Page header) -->
 
@@ -177,7 +181,7 @@ if($result -> num_rows > 0){
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Total Members</span>
+                                                    <span class="info-box-text text-info">Total Members</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
@@ -200,7 +204,7 @@ if($result -> num_rows > 0){
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Total Loan applications</span>
+                                                    <span class="info-box-text text-warning">Pending Loan applications</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
@@ -223,7 +227,7 @@ if($result -> num_rows > 0){
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Number of contributions</span>
+                                                    <span class="info-box-text text-info">Total contributions</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
@@ -275,7 +279,7 @@ if($result -> num_rows > 0){
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                 <div>
-                                    <h5 class="mb-1">💼 Active Loans</h5>
+                                    <h5 class="mb-1 text-success">💼 Active Loans</h5>
                                     <small class="text-muted">Profit to be realized</small>
                                 </div>
                                 <div class="text-success fw-bold">
@@ -319,7 +323,7 @@ if($result -> num_rows > 0){
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <div>
-                                        <h5 class="mb-1">💰 Pending Contributions</h5>
+                                        <h5 class="mb-1 text-warning">💰 Pending Contributions</h5>
                                     </div>
                                 </div>
                                 <div class="active-loan-scroll" style="max-height: 280px; overflow: auto;">
@@ -362,7 +366,7 @@ if($result -> num_rows > 0){
                             data: {
                             labels: data.labels,
                             datasets: [{
-                                label: 'Total Members',
+                                label: 'Joined Members',
                                 data: data.values,
                                 borderColor: 'blue',
                                 backgroundColor: 'rgba(0, 0, 255, 0.1)',
@@ -485,7 +489,7 @@ if($result -> num_rows > 0){
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Savings</span>
+                                                    <span class="info-box-text text-info">Savings</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
@@ -508,11 +512,11 @@ if($result -> num_rows > 0){
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Loan Balance</span>
+                                                    <span class="info-box-text text-warning">Loan Balance</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                <?php echo "Ksh." . (is_numeric($loan) ? number_format((float)$loan, 2) : "0.00")?></div>
+                                                <?php echo "Ksh." . (is_numeric($Loan_balance) ? number_format((float)$Loan_balance, 2) : "0.00")?></div>
                                         </div>
                                         <div class="col-auto">
                                             <i class="fas fa-landmark fa-2x text-gray-300"></i>
@@ -531,7 +535,7 @@ if($result -> num_rows > 0){
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
                                                 <div class="info-box-content">
-                                                    <span class="info-box-text">Pending Contributions</span>
+                                                    <span class="info-box-text text-danger">Pending Contributions</span>
                                                 </div>
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">

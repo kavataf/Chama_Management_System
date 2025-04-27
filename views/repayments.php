@@ -121,7 +121,6 @@ if ($user_role == 'System Administrator') {
                                                         <td><?= $row['repayment_date'] ?></td>
                                                     </tr>
                                                     <?php } ?>
-                                                    <?php require_once('../modals/add_repayment.php'); ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -251,7 +250,7 @@ if ($user_role == 'System Administrator') {
                                                 .then(data => {
                                                     if (data.status === 'success') {
                                                         alert('Payment Recorded!');
-                                                        window.location.reload(); // Reload page to reflect changes
+                                                        window.location.reload(); 
                                                     } else {
                                                         alert('Error: ' + data.message);
                                                     }

@@ -34,7 +34,8 @@ if (isset($_POST['update_member'])) {
                 );
 
                 if ($stmt_update->execute()) {
-                    $_SESSION['success'] = 'member updated successfully.';
+                    echo "<script>alert('member updated successfully.');</script>";
+                    // $_SESSION['success'] = 'member updated successfully.';
                     header('Location: ../views/members');
                     exit();
                 } else {
@@ -54,4 +55,5 @@ if (isset($_POST['update_member'])) {
         echo "Error checking member: " . $mysqli->error;
     }
 }
+
 ?>

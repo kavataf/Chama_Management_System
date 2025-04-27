@@ -36,11 +36,13 @@ if (isset($_POST['apply_loan'])) {
     $stmt->bind_param("iiiisss", $user_id, $loan_id, $loan_amount, $loan_duration, $loan_purpose, $loan_name, $application_date);
 
     if ($stmt->execute()) {
-        $_SESSION['success'] = "Loan application submitted successfully!";
+        echo "<script>alert('Loan application submitted successfully!');</script>";
+        // $_SESSION['success'] = "Loan application submitted successfully!";
         // header("Location: loans.php");
         exit();
     } else {
-        $_SESSION['error'] = "Something went wrong, please try again!";
+        echo "<script>alert('Something went wrong, please try again!');</script>";
+        // $_SESSION['error'] = "Something went wrong, please try again!";
     }
 }
 

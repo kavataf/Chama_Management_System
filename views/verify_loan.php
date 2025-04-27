@@ -86,7 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Check 30% rule
     if ($new_status == 'Approved' && $member_savings < ($loan_amount * 0.3)) {
-        $_SESSION['error'] = "Loan cannot be approved. Member savings are insufficient.";
+        // $_SESSION['error'] = "Loan cannot be approved. Member savings are insufficient.";
+        echo "<script>alert('Loan cannot be approved. Member savings are insufficient.');</script>";
         header("Location: applications.php");
         exit();
     }
@@ -130,8 +131,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             $stmt_insert->close();
         }
-
-        $_SESSION['success'] = "Loan application $new_status successfully!";
+        echo "<script>alert('Loan application $new_status successfully!');</script>";
+        // $_SESSION['success'] = "Loan application $new_status successfully!";
     }
 
     $stmt_update->close();

@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 );
 
                 if ($stmt_update->execute()) {
+                    echo "<script>alert('Product updated successfully.');</script>";
                     $_SESSION['success'] = 'Product updated successfully.';
                     header('Location: ../views/products');
                     exit();

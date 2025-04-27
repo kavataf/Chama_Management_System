@@ -95,7 +95,6 @@ $user_id = $_SESSION['user_id'];
                                                         <td colspan="8">No records found</td>
                                                     </tr>
                                                     <?php endif; ?>
-                                                    <?php require_once('../modals/add_savings.php'); ?>
                                                     <?php require_once('../modals/manage_savings.php'); ?>
                                                 </tbody>
                                             </table>

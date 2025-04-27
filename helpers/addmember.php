@@ -17,6 +17,7 @@ if (isset($_POST['member_details'])) {
     $member_password = bin2hex(random_bytes(8)); // Generate a random password
     $hashed_password = password_hash($member_password, PASSWORD_DEFAULT);
     $access_level = 'Member';
+    $status = 'active';
 
     // Start transaction
     $mysqli->begin_transaction();
@@ -35,9 +36,9 @@ if (isset($_POST['member_details'])) {
 
             // Insert into members table
             $stmt2 = $mysqli->prepare("INSERT INTO members (user_id, member_name, member_gender, 
-                member_email, member_phone, member_id_no) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt2->bind_param("isssss", $user_id, $member_name, $member_gender, 
-                $member_email, $member_phone, $member_id_no);
+                member_email, member_phone, member_id_no, member_status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt2->bind_param("issssss", $user_id, $member_name, $member_gender, 
+                $member_email, $member_phone, $member_id_no, $status);
 
             if ($stmt2->execute()) {
                 $mysqli->commit();
@@ -77,8 +78,8 @@ if (isset($_POST['member_details'])) {
                     header("location: members.php");
                     exit;
                 }
-
-                $_SESSION['success'] = "Member added successfully. Password has been sent to the email.";
+                echo "<script>alert('Member added successfully. Password has been sent to the email.');</script>";
+                // $_SESSION['success'] = "Member added successfully. Password has been sent to the email.";
                 header("location: members.php");
                 exit;
 

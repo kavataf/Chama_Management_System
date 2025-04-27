@@ -20,7 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         /* Persist */
         $update_query = "UPDATE users SET user_name = '{$user_names}', user_email = '{$user_email}', user_phone = '{$user_phone_number}', user_id_no = '{$user_id_no}' WHERE user_id = '{$user_id}'";
         if (mysqli_query($mysqli, $update_query)) {
-            $success = "User updated";
+            echo "<script>alert('User updated!');</script>";
+            // $success = "User updated";
         } else {
             $err = "Failed, please try again. Error: " . mysqli_error($mysqli);
         }
@@ -46,7 +47,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $new_password_hashed = password_hash($new_password, PASSWORD_BCRYPT);
                 $update_query = "UPDATE users SET user_password = '{$new_password_hashed}' WHERE user_id = '{$user_id}'";
                 if (mysqli_query($mysqli, $update_query)) {
-                    $success = "Password updated";
+                    echo "<script>alert('Password updated!');</script>";
+                    // $success = "Password updated";
                 } else {
                     $err = "Failed, please try again. Error: " . mysqli_error($mysqli);
                 }

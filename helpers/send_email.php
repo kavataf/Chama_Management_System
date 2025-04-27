@@ -50,10 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['send'])) {
 
         // Send email
         if ($mail->send()) {
-            $success = "Email sent successfully!";
+            echo "<script>alert('Email sent successfully!');</script>";
+            // $success = "Email sent successfully!";
             // header('location: emails');
         } else {
-            $err = "Failed to send email.";
+            echo "<script>alert('Failed to send email!');</script>";
+            // $err = "Failed to send email.";
         }
     } catch (Exception $e) {
         $err = "Email could not be sent. Error: {$mail->ErrorInfo}";
@@ -97,7 +99,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['sentMessage'])) {
 
         // Send the email
         if ($mail->send()) {
-            echo "Message has been sent successfully!";
+            echo "<script>alert('Message has been sent successfully!');</script>";
+            // echo "Message has been sent successfully!";
         } else {
             echo "Mailer Error: " . $mail->ErrorInfo;
         }

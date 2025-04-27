@@ -17,11 +17,13 @@ if(isset($_POST['product_details'])){
     $member_savings, $loan_description);
 
     if ($stmt->execute()) {
-        $_SESSION['success'] = "product details added successfully";
+        echo "<script>alert('product details added successfully!');</script>";
+        // $_SESSION['success'] = "product details added successfully";
         // header("location: products.php");
         exit;
     } else {
-        $err = "Something went wrong, please try again";
+        echo "<script>alert('Something went wrong, please try again!');</script>";
+        // $err = "Something went wrong, please try again";
     }
 }
 

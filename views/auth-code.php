@@ -23,8 +23,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Success
         $_SESSION['logged_in'] = true;
         unset($_SESSION['auth_code'], $_SESSION['auth_code_created_at']);
-        header("Location: home.php");
-        exit;
+         // Redirect after successful login and show alert
+         echo "<script>
+         alert('Login successful!');
+         window.location.href = 'home.php'; 
+       </script>";
+    exit;
     } else {
         $error = "Invalid authentication code.";
     }
