@@ -97,35 +97,62 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                              <h2>Add Contribution</h2>
                             
                              <!-- Add Contribution Form -->
-                                <form class="needs-validation" method="post" enctype="multipart/form-data">
-                                        <fieldset class="border p-2 border-success">
-                                            <legend class="w-auto text-success">Manage Contributions</legend>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="">Title<span class="text-danger">*</span></label>
-                                                    <input type="text" placeholder="Title" required name="title" class="form-control">
-                                                </div>
-                                                <div class="form-group col-md-6">
-                                                    <label for="">Amount<span class="text-danger">*</span></label>
-                                                    <input type="number" name="amount" class="form-control" placeholder="Amount" required>
-                                                </div>
-                                            </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    <label for="">Due Date<span class="text-danger">*</span></label>
-                                                    <input type="date" name="due_date" class="form-control" required>
-                                                </div>
-                                                
-                                            </div>
-                                        </fieldset>
-                                        <div class="modal-footer">
-                                            <div class="text-right">
-                                                <button type="submit" name="add_contribution" class="btn btn-outline-primary">
-                                                    <i class="fas fa-save"></i> Save
-                                                </button>
+                             <form class="needs-validation" method="post" enctype="multipart/form-data" novalidate>
+                                <fieldset class="border p-2 border-success">
+                                    <legend class="w-auto text-success">Manage Contributions</legend>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="title">Title<span class="text-danger">*</span></label>
+                                            <input type="text" id="title" name="title" class="form-control" placeholder="Title" required pattern="^[A-Za-z\s]+$">
+                                            <div class="invalid-feedback">
+                                                Please provide a valid title (only letters and spaces allowed).
                                             </div>
                                         </div>
-                                </form>
+                                        <div class="form-group col-md-6">
+                                            <label for="amount">Amount<span class="text-danger">*</span></label>
+                                            <input type="number" id="amount" name="amount" class="form-control" placeholder="Amount" required min="1" step="any">
+                                            <div class="invalid-feedback">
+                                                Please enter a valid amount greater than zero.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label for="due_date">Due Date<span class="text-danger">*</span></label>
+                                            <input type="date" id="due_date" name="due_date" class="form-control" required>
+                                            <div class="invalid-feedback">
+                                                Please select a due date.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <div class="modal-footer">
+                                    <div class="text-right">
+                                        <button type="submit" name="add_contribution" class="btn btn-outline-primary">
+                                            <i class="fas fa-save"></i> Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <script>
+                                (function () {
+                                    'use strict'
+                                    var forms = document.querySelectorAll('.needs-validation')
+
+                                    Array.prototype.slice.call(forms)
+                                        .forEach(function (form) {
+                                            form.addEventListener('submit', function (event) {
+                                                if (!form.checkValidity()) {
+                                                    event.preventDefault()
+                                                    event.stopPropagation()
+                                                }
+                                                form.classList.add('was-validated')
+                                            }, false)
+                                        })
+                                })()
+                            </script>
+
                             </div>
                           </div>
                          </div>

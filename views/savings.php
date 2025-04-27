@@ -165,23 +165,24 @@ $user_id = $_SESSION['user_id'];
                                 <div class="col-xl-12">
                                 <div class="content-section">
                                     <h2>Want to make a saving?</h2>
-                                <form id="paymentForm" class="needs-validation">
+                                <form id="paymentForm" class="needs-validation" novalidate>
                                     <fieldset class="border p-3 mb-3">
                                         <legend class="w-auto text-success">Enter details</legend>
 
                                         <div class="form-group">
                                             <label for="amount">Saving Amount <span class="text-danger">*</span></label>
-                                            <input type="number" id="amount" required class="form-control" placeholder="Enter amount">
+                                            <input type="number" id="amount" required class="form-control" placeholder="Enter amount" min="1">
+                                            <div class="invalid-feedback">
+                                                Please enter a valid amount greater than zero.
+                                            </div>
                                         </div>
-
-                                        <!-- <div class="form-group">
-                                            <label for="phone">Phone Number <span class="text-danger">*</span></label>
-                                            <input type="text" id="phone" required class="form-control" placeholder="e.g. 07XXXXXXXX">
-                                        </div> -->
 
                                         <div class="form-group">
                                             <label for="email">Email Address <span class="text-danger">*</span></label>
                                             <input type="email" id="email" required class="form-control" placeholder="Enter email">
+                                            <div class="invalid-feedback">
+                                                Please enter a valid email address.
+                                            </div>
                                         </div>
 
                                         <div class="text-right">
@@ -189,6 +190,32 @@ $user_id = $_SESSION['user_id'];
                                         </div>
                                     </fieldset>
                                 </form>
+                                <script>
+                                    document.getElementById("paymentForm").addEventListener("submit", function(event) {
+                                        if (!this.checkValidity()) {
+                                            event.preventDefault(); 
+                                            event.stopPropagation(); 
+                                        }
+
+                                        this.classList.add('was-validated');
+                                    });
+
+                                    document.getElementById("amount").addEventListener("input", function() {
+                                        if (this.validity.valid) {
+                                            this.classList.remove('is-invalid');
+                                        } else {
+                                            this.classList.add('is-invalid');
+                                        }
+                                    });
+
+                                    document.getElementById("email").addEventListener("input", function() {
+                                        if (this.validity.valid) {
+                                            this.classList.remove('is-invalid');
+                                        } else {
+                                            this.classList.add('is-invalid');
+                                        }
+                                    });
+                                </script>
 
                                 <script src="https://js.paystack.co/v1/inline.js"></script>
                                 <script>

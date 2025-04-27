@@ -114,12 +114,9 @@ if ($result->num_rows > 0) {
                                                     <tr>
                                                         <th style="width: 10px">No</th>
                                                         <th>Loan Name</th>
-                                                        <th>Loan Interest</th>
-                                                        <th>Loan Duration</th>
-                                                        <th>Processing Fee</th>
+                                                        <th class="d-flex flex-column"><span>Loan Duration</span><span>(Months)</span></th>
                                                         <th>Maximum limit</th>
-                                                        <th>Loan Penalty</th>
-                                                        <th>File</th>
+                                                        <th>Loan guarantors</th>
                                                         <th>loan Description</th>
                                                         <th>Manage</th>
                                                     </tr>
@@ -131,18 +128,11 @@ if ($result->num_rows > 0) {
                                                         <td><?php echo ($key + 1); ?></td>
                                                         <td><?php echo htmlspecialchars($product['loan_name']); ?>
                                                         </td>
-                                                        <td><?php echo htmlspecialchars($product['loan_interest']); ?>
-                                                        </td>
                                                         <td><?php echo htmlspecialchars($product['loan_duration']); ?>
-                                                        </td>
-                                                        <td><?php echo htmlspecialchars($product['processing_fee']); ?>
                                                         </td>
                                                         <td><?php echo htmlspecialchars($product['maximum_limit']); ?>
                                                         </td>
-                                                        <td><?php echo htmlspecialchars($product['loan_penalty']); ?>
-                                                        </td>
-                                                        <td><?php echo '<a href="' . htmlspecialchars($product['thumbnail']) . 
-                                                        '" target="_blank">View file</a>'; ?>
+                                                        <td><?php echo htmlspecialchars($product['loan_guarantors']); ?>
                                                         </td>
                                                         <td><?php echo htmlspecialchars($product['loan_description']); ?>
                                                         </td>
@@ -151,13 +141,9 @@ if ($result->num_rows > 0) {
                                                                 class="badge badge-primary"
                                                                 data-id="<?php echo $product['product_id']; ?>"
                                                                 data-name="<?php echo htmlspecialchars($product['loan_name']); ?>"
-                                                                data-interest="<?php echo htmlspecialchars($product['loan_interest']); ?>"
                                                                 data-duration="<?php echo htmlspecialchars($product['loan_duration']); ?>"
-                                                                data-fee="<?php echo htmlspecialchars($product['processing_fee']); ?>"
                                                                 data-limit="<?php echo htmlspecialchars($product['maximum_limit']); ?>"
                                                                 data-guarantors="<?php echo htmlspecialchars($product['loan_guarantors']); ?>"
-                                                                data-savings="<?php echo htmlspecialchars($product['member_savings']); ?>"
-                                                                data-penalty="<?php echo htmlspecialchars($product['loan_penalty']); ?>"
                                                                 data-description="<?php echo htmlspecialchars($product['loan_description']); ?>"
                                                                 onclick="setUpdateModalData(this)">
                                                                 <i class="fas fa-edit"></i> Update

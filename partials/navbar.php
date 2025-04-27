@@ -92,15 +92,6 @@
         </a>
     </li>
 
-    <?php if ($user_role == 'System Administrator') echo '
-    <li class="nav-item">
-        <a class="nav-link" href="expenses">
-            <i class="fas fa-fw fa-newspaper"></i>
-            <span>Expenses</span>
-        </a>
-    </li>';
-    ?>
-
     <!-- Divider -->
     <hr class="sidebar-divider">
 
@@ -109,16 +100,6 @@
         More
     </div>
 
-        
-
-    <?php if ($user_role == 'System Administrator') echo '
-    <li class="nav-item">
-        <a class="nav-link" href="reports">
-            <i class="fas fa-fw fa-chart-area"></i>
-            <span>Reports</span>
-        </a>
-    </li>';
-    ?>
     <li class="nav-item">
         <a class="nav-link" href="products">
             <i class="fas fa-fw fa-gift"></i>

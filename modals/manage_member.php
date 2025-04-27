@@ -12,7 +12,7 @@ $members = array();
 <div class="modal fade" id="updateMember" tabindex="-1" role="dialog" aria-labelledby="updateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
-            <form action="../helpers/managemember.php" method="post">
+            <form action="../helpers/managemember.php" id="ManageMemberForm" method="post" novalidate>
                 <div class="modal-header align-items-center">
                     <div class="text-bold">
                         <h6 class="modal-title text-bold" id="updateModalLabel">Update Member</h6>
@@ -26,15 +26,18 @@ $members = array();
                     <div class="row">
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-member-name">Name</label>
-                            <input type="text" class="form-control" name="member_name" id="update-member-name" required>
+                            <input type="text" class="form-control" name="member_name" id="update-member-name" required pattern="[A-Za-z\s]+" title="Name should contain only letters and spaces.">
+                            <div class="invalid-feedback">Please enter a valid full name (only letters and spaces).</div>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-member-id-no">ID No.</label>
-                            <input type="text" class="form-control" name="member_id_no" id="update-member-id-no" required>
+                            <input type="text" class="form-control" name="member_id_no" id="update-member-id-no" required  pattern="^\d{8}$" title="ID number must be exactly 8 digits.">
+                            <div class="invalid-feedback">Please enter a valid 8-digit ID number.</div>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-member-phone">Phone</label>
-                            <input type="phone" class="form-control" name="member_phone" id="update-member-phone" required>
+                            <input type="phone" class="form-control" name="member_phone" id="update-member-phone" required pattern="^(07|01)\d{8}$" title="Phone number must be 10 digits and start with 07 or 01.">
+                            <div class="invalid-feedback">Please enter a valid phone number (10 digits, starting with 07 or 01).</div>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-member-gender">Gender</label>
@@ -43,10 +46,12 @@ $members = array();
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                             </select>
+                            <div class="invalid-feedback">Please select a gender.</div>
                         </div>
                         <div class="form-group col-sm-12 col-lg-4 col-xl-4">
                             <label for="update-member-email">Email</label>
                             <input type="email" class="form-control" name="member_email" id="update-member-email" required>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
                         </div>
                     </div>
                 </div>
@@ -81,6 +86,20 @@ $members = array();
 
 
 <script>
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var form = document.getElementById('ManageMemberForm');
+            form.addEventListener('submit', function (event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        }, false);
+    })();
+
     function setUpdateModalData(element) {
         document.getElementById('update-member-id').value = element.getAttribute('data-user-id');
         document.getElementById('update-member-name').value = element.getAttribute('data-name');

@@ -117,60 +117,62 @@ while ($row = $result->fetch_assoc()) {
                             <div id="loanapplication" class="content-section">
                             <h3>Enter details for loan application</h3>
                             <!-- Loan Application Form -->
-                            <form class="needs-validation" method="post" enctype="multipart/form-data">
+                            <form class="needs-validation" method="post" enctype="multipart/form-data" novalidate>
                                 <fieldset class="border p-2 border-success">
                                     <legend class="w-auto text-success">Loan / Personal Details</legend>
                                     <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label for="">Loan Name<span class="text-danger">*</span></label>
-                                        <div class="d-flex align-items-center">
-                                            <select required name="loan_name" id="loan_name" class="form-control" onchange="fetchLoanDetails()">
-                                                <option value="">-- Select Loan Product --</option>
-                                                <?php foreach ($products as $product): ?>
-                                                    <option value="<?php echo htmlspecialchars($product['loan_name']); ?>">
-                                                        <?php echo htmlspecialchars($product['loan_name']); ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <div id="loadingSpinner" style="display: none; margin-left: 10px;">
-                                                <div class="spinner-border text-primary spinner-border-sm" role="status">
-                                                    <span class="sr-only">Loading...</span>
+                                        <div class="form-group col-md-6">
+                                            <label for="loan_name">Loan Name<span class="text-danger">*</span></label>
+                                            <div class="d-flex align-items-center">
+                                                <select required name="loan_name" id="loan_name" class="form-control" onchange="fetchLoanDetails()">
+                                                    <option value="">-- Select Loan Product --</option>
+                                                    <?php foreach ($products as $product): ?>
+                                                        <option value="<?php echo htmlspecialchars($product['loan_name']); ?>">
+                                                            <?php echo htmlspecialchars($product['loan_name']); ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                                <div id="loadingSpinner" style="display: none; margin-left: 10px;">
+                                                    <div class="spinner-border text-primary spinner-border-sm" role="status">
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
                                         <div class="form-group col-md-6">
-                                            <label for="">Loan Duration<span class="text-danger">*</span></label>
-                                            <input type="text" placeholder="" required name="loan_duration" id="loan_duration" class="form-control" readonly>
+                                            <label for="loan_duration">Loan Duration (Months)<span class="text-danger">*</span></label>
+                                            <input type="number" readonly name="loan_duration" id="loan_duration" class="form-control" min="1">
                                         </div>
                                     </div>
+
                                     <div class="form-row">
                                         <!-- Loan Amount (editable) -->
                                         <div class="form-group col-md-6">
-                                            <label for="loan_amount">Loan Amount (Months)<span class="text-danger">*</span></label>
-                                            <input type="number" required name="loan_amount" id="loan_amount" class="form-control">
+                                            <label for="loan_amount">Loan Amount<span class="text-danger">*</span></label>
+                                            <input type="number" required name="loan_amount" id="loan_amount" class="form-control" min="1" step="any" placeholder="Enter loan amount">
                                         </div>
 
                                         <!-- Interest Rate (readonly) -->
                                         <div class="form-group col-md-6">
-                                            <label for="loan_interest">Interest Rate (%)<span class="text-danger">*</span></label>
-                                            <input type="text" name="loan_interest" id="loan_interest" class="form-control" readonly>
+                                            <label for="interest_rate">Interest Rate (%)<span class="text-danger">*</span></label>
+                                            <input type="number" name="interest_rate" id="loan_interest" class="form-control" readonly>
                                         </div>
                                     </div>
+
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
-                                            <label for="">Application Date<span class="text-danger">*</span></label>
-                                            <input type="date" placeholder="" required name="application_date"
-                                                class="form-control">
+                                            <label for="application_date">Application Date<span class="text-danger">*</span></label>
+                                            <input type="date" required name="application_date" id="application_date" class="form-control" max="<?php echo date('Y-m-d'); ?>">
                                         </div>
-                        
                                     </div>
+
                                     <div class="form-group col-md-8">
                                         <label for="loan_purpose">Loan Purpose<span class="text-danger">*</span></label>
-                                        <textarea required name="loan_purpose" id="loan_purpose" class="form-control"></textarea>
+                                        <textarea required name="loan_purpose" id="loan_purpose" class="form-control" maxlength="500" placeholder="Describe the purpose of the loan"></textarea>
                                     </div>
                                 </fieldset>
+
                                 <div class="modal-footer">
                                     <div class="text-right">
                                         <button type="submit" name="apply_loan" class="btn btn-outline-primary">
@@ -178,9 +180,17 @@ while ($row = $result->fetch_assoc()) {
                                         </button>
                                     </div>
                                 </div>
-
-
                             </form>
+                            <script>
+                                document.querySelector("form").addEventListener("submit", function(event) {
+                                    var loanAmount = document.getElementById("loan_amount").value;
+                                    if (loanAmount <= 0) {
+                                        alert("Please enter a valid loan amount.");
+                                        event.preventDefault();
+                                    }
+                                });
+
+                            </script>
 
                             <script>
                                 function fetchLoanDetails() {

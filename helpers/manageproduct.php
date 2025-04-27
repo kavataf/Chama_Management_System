@@ -4,13 +4,9 @@ require_once('../config/config.php');
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $product_id = $_POST['product_id'];
     $loan_name = $_POST['loan_name'];
-    $loan_interest = $_POST['loan_interest'];
     $loan_duration = $_POST['loan_duration'];
-    $processing_fee = $_POST['processing_fee'];
     $maximum_limit = $_POST['maximum_limit'];
     $loan_guarantors = $_POST['loan_guarantors'];
-    $member_savings = $_POST['member_savings'];
-    $loan_penalty = $_POST['loan_penalty'];
     $loan_description = $_POST['loan_description'];
 
     // Check if the product exists
@@ -21,26 +17,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt_product->store_result();
 
         if ($stmt_product->num_rows > 0) {
-            $stmt_product->close(); // Close after checking existence
+            $stmt_product->close(); 
 
             // Prepare the SQL statement to update the product
             $sql = "UPDATE products SET 
                         loan_name = ?, 
-                        loan_interest = ?, 
                         loan_duration = ?, 
-                        processing_fee = ?, 
                         maximum_limit = ?, 
                         loan_guarantors = ?, 
-                        member_savings = ?, 
-                        loan_penalty = ?, 
                         loan_description = ?
                     WHERE product_id = ?";
 
             if ($stmt_update = $mysqli->prepare($sql)) {
                 $stmt_update->bind_param(
-                    'sisiisiisi',
-                    $loan_name, $loan_interest, $loan_duration, $processing_fee,
-                    $maximum_limit, $loan_guarantors, $member_savings, $loan_penalty,
+                    'siissi',
+                    $loan_name, $loan_duration,
+                    $maximum_limit, $loan_guarantors,
                     $loan_description, $product_id
                 );
 

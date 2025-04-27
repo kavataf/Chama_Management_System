@@ -33,7 +33,7 @@ if (isset($_POST['apply_loan'])) {
     // Insert loan application with loan_id
     $stmt = $mysqli->prepare("INSERT INTO applications (user_id, loan_id, loan_amount, loan_duration, loan_purpose, 
         loan_name, loan_status, application_date) VALUES (?, ?, ?, ?, ?, ?, 'Pending', ?)");
-    $stmt->bind_param("iiissss", $user_id, $loan_id, $loan_amount, $loan_duration, $loan_purpose, $loan_name, $application_date);
+    $stmt->bind_param("iiiisss", $user_id, $loan_id, $loan_amount, $loan_duration, $loan_purpose, $loan_name, $application_date);
 
     if ($stmt->execute()) {
         $_SESSION['success'] = "Loan application submitted successfully!";

@@ -78,6 +78,7 @@ if ($amount_required < 0) {
                 <div class="mb-3">
                     <label for="amount" class="form-label">Enter Amount:</label>
                     <input type="number" id="amount_paid" name="amount_paid" class="form-control" required min="1" max="<?php echo $amount_required; ?>">
+                    <div id="amountError" class="text-danger d-none">Please enter a valid amount between 1 and <?php echo $amount_required; ?>.</div>
                 </div>
 
                 <button type="submit" id="payButton" class="btn btn-success">
@@ -91,78 +92,93 @@ if ($amount_required < 0) {
                 document.getElementById('paymentForm').addEventListener('submit', function(e) {
                     e.preventDefault();
 
-                    const payButton = document.getElementById('payButton');
-                    const buttonText = document.getElementById('buttonText');
-                    const spinner = document.getElementById('spinner');
+                    // Hide previous error messages
+                    document.getElementById('amountError').classList.add('d-none');
 
-                    // Disable button and show spinner
-                    payButton.disabled = true;
-                    buttonText.textContent = 'Processing...';
-                    spinner.classList.remove('d-none');
+                    // Get the input value
+                    const amountPaid = document.getElementById('amount_paid').value;
+                    const minAmount = 1;
+                    const maxAmount = <?php echo $amount_required; ?>;
 
-                    const contribution_id = document.getElementById('contribution_id').value;
-                    const member_id = document.getElementById('member_id').value;
-                    const amount = document.getElementById('amount_paid').value;
+                    // Validate amount
+                    if (amountPaid < minAmount || amountPaid > maxAmount) {
+                        document.getElementById('amountError').classList.remove('d-none');
+                    } else {
+                        const payButton = document.getElementById('payButton');
+                        const buttonText = document.getElementById('buttonText');
+                        const spinner = document.getElementById('spinner');
 
-                    function payWithPaystack(e) {
-                        let email = "<?php echo $_SESSION['user_email']; ?>";  
-                        let amount = document.querySelector('input[name="amount_paid"]').value;
-                        let contribution_id = document.getElementById('contribution_id').value;
-                        let member_id = document.getElementById('member_id').value;
+                        // Disable button and show spinner
+                        payButton.disabled = true;
+                        buttonText.textContent = 'Processing...';
+                        spinner.classList.remove('d-none');
 
-                        if (!email || !amount) {
-                            alert("Please fill in all fields");
-                            return;
+                        const contribution_id = document.getElementById('contribution_id').value;
+                        const member_id = document.getElementById('member_id').value;
+                        const amount = document.getElementById('amount_paid').value;
+
+                        function payWithPaystack() {
+                            let email = "<?php echo $_SESSION['user_email']; ?>";
+                            let amount = document.getElementById('amount_paid').value;
+                            let contribution_id = document.getElementById('contribution_id').value;
+                            let member_id = document.getElementById('member_id').value;
+
+                            if (!email || !amount) {
+                                alert("Please fill in all fields");
+                                return;
+                            }
+
+                            let handler = PaystackPop.setup({
+                                key: 'pk_test_2d11faf4649f14c3568d4df5f9faddf55ca9a65d',
+                                email: email,
+                                amount: amount * 100, // Paystack expects the amount in kobo (1 KES = 100 Kobo)
+                                currency: "KES",
+                                channels: ['mobile_money'],
+                                callback: function(response) {
+                                    // Payment complete, verify
+                                    fetch('../helpers/verify_contribution.php', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json'
+                                        },
+                                        body: JSON.stringify({
+                                            reference: response.reference,
+                                            contribution_id: contribution_id,
+                                            member_id: member_id,
+                                            amount: amount
+                                        })
+                                    })
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        if (data.status === 'success') {
+                                            alert('Contribution recorded successfully!');
+                                            window.location.href = "contributions.php";
+                                        } else {
+                                            alert('Error recording contribution: ' + data.message);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error:', error);
+                                        alert('Failed to record contribution.');
+                                    });
+                                },
+                                onClose: function() {
+                                    alert('Transaction was not completed.');
+                                    payButton.disabled = false;
+                                    buttonText.textContent = 'Make Payment';
+                                    spinner.classList.add('d-none');
+                                },
+                            });
+
+                            handler.openIframe();
                         }
 
-                        let handler = PaystackPop.setup({
-                            key: 'pk_test_2d11faf4649f14c3568d4df5f9faddf55ca9a65d', 
-                            email: email,
-                            amount: amount * 100, 
-                            currency: "KES",
-                            channels: ['mobile_money'], 
-                            callback: function(response) {
-                                // Payment complete, verify
-                                fetch('../helpers/verify_contribution.php', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        reference: response.reference,
-                                        contribution_id: contribution_id,
-                                        member_id: member_id,
-                                        amount: amount
-                                    })
-                                })
-                                .then(response => response.json())
-                                .then(data => {
-                                    if (data.status === 'success') {
-                                        alert('Contribution recorded successfully!');
-                                        window.location.href = "contributions.php";
-                                    } else {
-                                        alert('Error recording contribution: ' + data.message);
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    alert('Failed to record contribution.');
-                                });
-                            },
-                            onClose: function() {
-                                alert('Transaction was not completed.');
-                                payButton.disabled = false;
-                                buttonText.textContent = 'Make Payment';
-                                spinner.classList.add('d-none');
-                            },
-                        });
-                        handler.openIframe();
+                        // Call the function here to start the payment process
+                        payWithPaystack();
                     }
-
-                    // CALL the function here!!
-                    payWithPaystack(e);
                 });
             </script>
+
 
         </div>
             
