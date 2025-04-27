@@ -64,12 +64,12 @@
                             <small><?php echo htmlspecialchars($_SESSION['user_access_level']); ?></small>
                         </span>
                         <?php if ($user_role == 'Member'): ?>
-                            <span class="notification-icon position-relative pc-head-link"
+                            <!-- <span class="notification-icon position-relative pc-head-link"
                             id="notificationDropdownToggle" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
                             🛎
                             <span id="notification-count"
                                 class="badge bg-success pc-h-badge position-absolute top-0 translate-middle rounded-circle"></span>
-                            </span>
+                            </span> -->
                         <?php endif; ?>
 
                         <img class="img-profile rounded-circle" src="../public/img/no-profile.png">

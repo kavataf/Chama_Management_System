@@ -64,7 +64,7 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                 <?php if ($user_role == 'System Administrator') : ?>
                     <div class="container">
                             <div class="row mb-4">
-                                <div class="col-xl-4 col-md-4 mb-4">
+                                <div class="col-xl-6 col-md-6 mb-4">
                                     <a href="#" class="btn btn-primary btn-icon-split"
                                         onclick="showSection('addcontribution')">
                                         <span class="icon text-white-50">
@@ -73,7 +73,7 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                                         <span class="text">Add Contribution</span>
                                     </a>
                                 </div>
-                                <div class="col-xl-4 col-md-4 mb-4">
+                                <div class="col-xl-6 col-md-6 mb-4">
                                     <a href="#" class="btn btn-primary btn-icon-split"
                                         onclick="showSection('viewcontribution')">
                                         <span class="icon text-white-50">
@@ -83,11 +83,11 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                                     </a>
                                 </div>
                                 
-                                <div class="col-xl-4 col-md-4 mb-4">
+                                <!-- <div class="col-xl-4 col-md-4 mb-4">
                                     <form method="post" action="notifications.php">
                                         <button class="btn btn-primary" type="submit" name="send_notifications">Send Contribution Notifications</button>
                                     </form>
-                                </div>
+                                </div> -->
                             </div>
 
                         <div class="container mt-4">

@@ -123,9 +123,9 @@ $members_query = $query->get_result();
                             </table>
                             <div class="text-right">
                                 <a href="contributions.php" class="btn btn-success m-2">Back</a>
-                                <a href="../reports/pdf/" class="btn btn-info m-2">
+                                <!-- <a href="../reports/pdf/" class="btn btn-info m-2">
                                     <i class="fas fa-save"></i> Generate Report
-                                </a>
+                                </a> -->
                             </div>
                     </div>
 

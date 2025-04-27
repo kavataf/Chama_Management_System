@@ -59,6 +59,12 @@ if ($user_role == 'System Administrator') {
     $result = getRepayments($mysqli, $user_id);
 }
 
+$repay = "SELECT r.*, u.user_name, a.loan_name
+FROM repayments r
+JOIN users u ON u.user_id = r.user_id
+LEFT JOIN applications a ON a.application_id = r.loan_id";
+
+$result_repay = $mysqli -> query($repay);
 
 
 
@@ -101,6 +107,24 @@ if ($user_role == 'System Administrator') {
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-lg-12 table-responsive">
+                                        <div class="d-flex mb-3">
+                                            <div class="input-group col-6 me-3">
+                                                <input type="text" id="nameFilter" class="form-control" placeholder="Filter by Member Name" onkeyup="filterTable()">
+                                            </div>
+
+                                            <div class="input-group" style="width: 200px;">
+                                                <span class="input-group-text mr-2">Rows</span>
+                                                <select id="rowsPerPage" class="form-select" onchange="filterTable()" 
+                                                style="width: 100px; outline: none;">
+                                                    <option value="5">5</option>
+                                                    <option value="10" selected>10</option>
+                                                    <option value="25">25</option>
+                                                    <option value="1000">All</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+
                                             <!-- breakdown table -->
                                             <table class="table table-bordered" id="datatable">
                                                 <thead>
@@ -110,19 +134,47 @@ if ($user_role == 'System Administrator') {
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                <?php while ($row = $result->fetch_assoc()) { ?>
-                                                    <tr style="background: <?= $row['status'] == 'overdue' ? '#fdd' : '#dfd' ?>;">
-                                                        <td><?= $row['user_id'] ?></td>
-                                                        <td><?= $row['loan_id'] ?></td>
-                                                        <td><?= $row['due_date'] ?></td>
-                                                        <td><?= $row['loan_amount'] ?></td>
-                                                        <td><?= $row['amount_paid'] ?></td>
-                                                        <td><?= ucfirst($row['status']) ?></td>
-                                                        <td><?= $row['repayment_date'] ?></td>
+                                                <?php while ($repayresult = $result_repay->fetch_assoc()) { ?>
+                                                    <tr style="background: <?= $repayresult['status'] == 'overdue' ? '#fdd' : '#dfd' ?>;">
+                                                        <td><?= $repayresult['user_name'] ?></td>
+                                                        <td><?= $repayresult['loan_name'] ?></td>
+                                                        <td><?= $repayresult['due_date'] ?></td>
+                                                        <td><?= $repayresult['loan_amount'] ?></td>
+                                                        <td><?= $repayresult['amount_paid'] ?></td>
+                                                        <td><?= ucfirst($repayresult['status']) ?></td>
+                                                        <td><?= $repayresult['repayment_date'] ?></td>
                                                     </tr>
                                                     <?php } ?>
                                                 </tbody>
                                             </table>
+                                            <script>
+                                               function filterTable() {
+                                                    const input = document.getElementById("nameFilter").value.toLowerCase();
+                                                    const rowsPerPage = parseInt(document.getElementById("rowsPerPage").value, 10);
+                                                    const table = document.getElementById("datatable");
+                                                    const tr = table.getElementsByTagName("tr");
+
+                                                    let visibleCount = 0;
+
+                                                    for (let i = 1; i < tr.length; i++) {
+                                                        const td = tr[i].getElementsByTagName("td")[0];
+                                                        if (td) {
+                                                            const textValue = td.textContent || td.innerText;
+                                                            if (textValue.toLowerCase().indexOf(input) > -1) {
+                                                                if (visibleCount < rowsPerPage || rowsPerPage >= 1000) {
+                                                                    tr[i].style.display = "";
+                                                                    visibleCount++;
+                                                                } else {
+                                                                    tr[i].style.display = "none";
+                                                                }
+                                                            } else {
+                                                                tr[i].style.display = "none";
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                            </script>
                                         </div>
                                     </div>
                                 </div>

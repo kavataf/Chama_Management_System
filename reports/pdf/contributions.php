@@ -98,7 +98,6 @@ $html =
                     </div> 
                     <div class="list_header" align="center">
                         <h3>
-                            <img  src="'.$base64.'" style="width:50%" alt="Logo">  <br>
                             <hr style="width:100%" , color=black><br>
                             List of all contributions <br>
                         </h3>                        

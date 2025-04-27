@@ -558,7 +558,7 @@ if($result -> num_rows > 0){
                     <div class="col-md-6">
                         <div class="card p-3">
                         <div class="card-title">💸 Loan Repayment Progress</div>
-                        <div style="height: 300px;">
+                        <div style="height: 300px;" id="loanRepaymentChartContainer">
                             <canvas id="loanRepaymentChart" width="500px" height="250px"></canvas>
                         </div>
                         </div>
@@ -568,7 +568,7 @@ if($result -> num_rows > 0){
                     <div class="col-md-6">
                         <div class="card p-3">
                         <div class="card-title">🏦 Recent transactions</div>
-                        <div style="height: 250px; overflow: auto;">
+                        <div style="height: 300px; overflow: auto;" id="transactions-listContainer">
                             <div id="transactions-list"></div>
                         </div>
                         </div>
@@ -580,11 +580,28 @@ if($result -> num_rows > 0){
                         .then(response => response.json())
                         .then(chartData => {
                             if (chartData.message) {
-                                document.getElementById("loanRepaymentChart").replaceWith(
-                                    `<p class="text-muted">${chartData.message}</p>`
-                                );
+                                const container = document.getElementById("loanRepaymentChartContainer");
+
+                                // Clear the container
+                                container.innerHTML = "";
+
+                                // Create the message element
+                                const messageParagraph = document.createElement("p");
+                                messageParagraph.className = "text-danger text-center";
+                                messageParagraph.style.padding = "20px"; 
+                                messageParagraph.style.fontSize = "16px"; 
+                                messageParagraph.textContent = chartData.message;
+
+                                // Remove any fixed size styling from container
+                                container.style.height = "auto";
+                                container.style.width = "100%"; 
+
+                                // Add the message
+                                container.appendChild(messageParagraph);
+
                                 return;
-                                }
+                            }
+
                         const ctx = document.getElementById("loanRepaymentChart").getContext("2d");
 
                         new Chart(ctx, {
@@ -634,10 +651,34 @@ if($result -> num_rows > 0){
                                     .then(response => response.json())
                                     .then(data => {
                                         let transactionsHTML = "";
+                                        if (data.message) {
+                                            const canvas = document.getElementById("transactions-list");
+                                            const container = document.getElementById("transactions-listContainer");
 
-                                        if (data.length === 0) {
-                                            transactionsHTML = "<p>No recent transactions.</p>";
-                                        } else {
+                                            // Clear the transactions-list content
+                                            container.innerHTML = "";
+
+                                            // Create the message element
+                                            const messageParagraph = document.createElement("p");
+                                            messageParagraph.className = "text-danger text-center"; 
+                                            messageParagraph.style.padding = "20px";
+                                            messageParagraph.style.fontSize = "16px";
+                                            messageParagraph.textContent = data.message;
+
+                                            // Make sure the container adjusts nicely
+                                            container.style.display = "flex";
+                                            container.style.justifyContent = "center";
+                                            container.style.alignItems = "center";
+                                            container.style.height = "100%"; 
+                                            container.style.width = "100%";
+
+                                            // Add the message
+                                            container.appendChild(messageParagraph);
+
+                                            return;
+                                        }
+
+                                        else {
                                             data.forEach(transaction => {
                                                 let badgeClass = transaction.status.toLowerCase() === 'paid' ? 'bg-success' : 'bg-warning';
 
