@@ -23,15 +23,16 @@ if (!isset($_SESSION['user_id'])) {
 
 $applications = array();
 $sql = "SELECT a.*, u.user_name
-FROM applications a
-JOIN users u
-WHERE u.user_id = a.user_id";
-$result = $mysqli -> query($sql);
-if($result -> num_rows > 0){
-    while($row = $result -> fetch_assoc()){
+        FROM applications a
+        JOIN users u ON u.user_id = a.user_id
+        ORDER BY a.application_date DESC";  
+$result = $mysqli->query($sql);
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
         $applications[] = $row;
     }
 }
+
 
 ?>
 

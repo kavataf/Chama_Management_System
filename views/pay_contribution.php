@@ -18,15 +18,36 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $contribution_id = (int) $_GET['id'];
 
 // Fetch contribution details
-$contribution_query = mysqli_query($mysqli, "SELECT * FROM contributions 
-WHERE contribution_id = $contribution_id");
+$contribution_query = mysqli_query($mysqli, "SELECT * FROM contributions WHERE contribution_id = $contribution_id");
 if (!$contribution_query || mysqli_num_rows($contribution_query) == 0) {
     die("Contribution not found.");
 }
 $contribution = mysqli_fetch_assoc($contribution_query);
+
+// Fetch member's previous payment for this contribution
+$payment_query = mysqli_query($mysqli, "SELECT SUM(amount_paid) AS total_paid 
+    FROM member_contributions 
+    WHERE contribution_id = $contribution_id AND member_id = $user_id");
+
+$payment = mysqli_fetch_assoc($payment_query);
+$total_paid = $payment['total_paid'] ?? 0;
+
+// Calculate remaining amount
+$amount_required = $contribution['amount'] - $total_paid;
+if ($amount_required < 0) {
+    $amount_required = 0; 
+}
+
 ?>
 
 <body id="page-top">
+
+<style>
+.d-none {
+    display: none !important;
+}
+</style>
+
 
 <!-- Page Wrapper -->
 <div id="wrapper">
@@ -48,21 +69,101 @@ $contribution = mysqli_fetch_assoc($contribution_query);
         <div class="level">
         <div class="container mt-4">
             <h2>Pay Contribution: <?php echo htmlspecialchars($contribution['title']); ?></h2>
-            <p>Amount Required: <strong><?php echo number_format($contribution['amount'], 2); ?></strong></p>
+            <p>Amount Required: <strong><?php echo number_format($amount_required, 2); ?></strong></p>
 
-            <form action="../helpers/process_payment.php" method="POST">
-                <input type="hidden" name="contribution_id" value="<?php echo $contribution_id; ?>">
-                <input type="hidden" name="member_id" value="<?php echo $user_id; ?>">
+            <form id="paymentForm">
+                <input type="hidden" id="contribution_id" value="<?php echo $contribution_id; ?>">
+                <input type="hidden" id="member_id" value="<?php echo $user_id; ?>">
 
                 <div class="mb-3">
                     <label for="amount" class="form-label">Enter Amount:</label>
-                    <input type="number" name="amount_paid" class="form-control" required min="1">
+                    <input type="number" id="amount_paid" name="amount_paid" class="form-control" required min="1" max="<?php echo $amount_required; ?>">
                 </div>
 
-                <button type="submit" name="pay_contribution"class="btn btn-success">Make Payment</button>
+                <button type="submit" id="payButton" class="btn btn-success">
+                    <span id="buttonText">Make Payment</span>
+                    <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                </button>
                 <a href="contributions.php" class="btn btn-secondary">Cancel</a>
-                
             </form>
+
+            <script>
+                document.getElementById('paymentForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const payButton = document.getElementById('payButton');
+                    const buttonText = document.getElementById('buttonText');
+                    const spinner = document.getElementById('spinner');
+
+                    // Disable button and show spinner
+                    payButton.disabled = true;
+                    buttonText.textContent = 'Processing...';
+                    spinner.classList.remove('d-none');
+
+                    const contribution_id = document.getElementById('contribution_id').value;
+                    const member_id = document.getElementById('member_id').value;
+                    const amount = document.getElementById('amount_paid').value;
+
+                    function payWithPaystack(e) {
+                        let email = "<?php echo $_SESSION['user_email']; ?>";  
+                        let amount = document.querySelector('input[name="amount_paid"]').value;
+                        let contribution_id = document.getElementById('contribution_id').value;
+                        let member_id = document.getElementById('member_id').value;
+
+                        if (!email || !amount) {
+                            alert("Please fill in all fields");
+                            return;
+                        }
+
+                        let handler = PaystackPop.setup({
+                            key: 'pk_test_2d11faf4649f14c3568d4df5f9faddf55ca9a65d', 
+                            email: email,
+                            amount: amount * 100, 
+                            currency: "KES",
+                            channels: ['mobile_money'], 
+                            callback: function(response) {
+                                // Payment complete, verify
+                                fetch('../helpers/verify_contribution.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        reference: response.reference,
+                                        contribution_id: contribution_id,
+                                        member_id: member_id,
+                                        amount: amount
+                                    })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (data.status === 'success') {
+                                        alert('Contribution recorded successfully!');
+                                        window.location.href = "contributions.php";
+                                    } else {
+                                        alert('Error recording contribution: ' + data.message);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error:', error);
+                                    alert('Failed to record contribution.');
+                                });
+                            },
+                            onClose: function() {
+                                alert('Transaction was not completed.');
+                                payButton.disabled = false;
+                                buttonText.textContent = 'Make Payment';
+                                spinner.classList.add('d-none');
+                            },
+                        });
+                        handler.openIframe();
+                    }
+
+                    // CALL the function here!!
+                    payWithPaystack(e);
+                });
+            </script>
+
         </div>
             
         </div>
@@ -85,7 +186,7 @@ $contribution = mysqli_fetch_assoc($contribution_query);
 <a class="scroll-to-top rounded" href="#page-top">
     <i class="fas fa-angle-up"></i>
 </a>
-
+<script src="https://js.paystack.co/v1/inline.js"></script>
 
 <?php require_once('../partials/scripts.php'); ?>
 </body>

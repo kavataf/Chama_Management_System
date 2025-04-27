@@ -125,18 +125,15 @@
             <span>Products</span>
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link" href="sms">
-            <i class="fas fa-fw fa-comment"></i>
-            <span>SMS</span>
-        </a>
-    </li>
+    <?php if ($user_role == 'System Administrator') echo '
     <li class="nav-item">
         <a class="nav-link" href="emails">
             <i class="fas fa-fw fa-envelope"></i>
             <span>Emails</span>
         </a>
-    </li>
+    </li>';
+    ?>
+    
 
 
     <!-- Divider -->

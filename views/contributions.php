@@ -205,30 +205,48 @@ while ($row = mysqli_fetch_assoc($paid_contributions_query)) {
                           <div class="col-xl-12">
                             <div id="pendingcontribution" class="content-section">
                               <!-- Display Pending Contributions -->
-                            <h4 class="mt-4">Pending Contributions</h4>
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Title</th>
-                                        <th>Amount</th>
-                                        <th>Due Date</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php while ($contribution = mysqli_fetch_assoc($contributions)) { 
-                                        if (!isset($paid_contributions[$contribution['contribution_id']])) { 
-                                    ?>
+                              <h4 class="mt-4">Pending Contributions</h4>
+
+                                <table class="table table-bordered">
+                                    <thead>
                                         <tr>
-                                            <td><?php echo htmlspecialchars($contribution['title']); ?></td>
-                                            <td><?php echo number_format($contribution['amount'], 2); ?></td>
-                                            <td><?php echo $contribution['due_date']; ?></td>
-                                            <td><a href="pay_contribution.php?id=<?php echo $contribution['contribution_id']; ?>" 
-                                            class="btn btn-success">Pay Now</a></td>
+                                            <th>Title</th>
+                                            <th>Amount</th>
+                                            <th>Due Date</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
                                         </tr>
-                                    <?php } } ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        <?php while ($contribution = mysqli_fetch_assoc($contributions)) { 
+                                            $contribution_id = $contribution['contribution_id'];
+                                            $status = isset($paid_contributions[$contribution_id]) ? $paid_contributions[$contribution_id]['status'] : null;
+
+                                            if ($status !== 'Paid') { 
+                                        ?>
+                                            <tr>
+                                                <td><?php echo htmlspecialchars($contribution['title']); ?></td>
+                                                <td><?php echo number_format($contribution['amount'], 2); ?></td>
+                                                <td><?php echo htmlspecialchars($contribution['due_date']); ?></td>
+                                                <td>
+                                                    <?php 
+                                                    if ($status === 'Partially Paid') {
+                                                        echo '<span class="badge bg-warning text-dark">Partially Paid</span>';
+                                                    } else {
+                                                        echo '<span class="badge bg-danger text-white">Pending</span>';
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <a href="pay_contribution.php?id=<?php echo $contribution_id; ?>" class="btn btn-success btn-sm">
+                                                        <?php echo ($status === 'partially paid') ? 'Complete Payment' : 'Pay Now'; ?>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <?php } } ?>
+                                    </tbody>
+                                </table>
+
                             </div>
                           </div>
                          </div>

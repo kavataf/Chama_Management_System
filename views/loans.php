@@ -13,16 +13,11 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch loan details
-$sql = "SELECT a.user_id, a.loan_name, a.loan_status, a.loan_purpose, a.loan_amount, a.loan_duration,
-       IFNULL(p.loan_interest, 0) AS interest,
-       IFNULL(p.processing_fee, 0) AS processing_fee,
-       IFNULL(p.loan_penalty, 0) AS penalty,
-       (a.loan_amount + (a.loan_amount * p.loan_interest / 100) + p.processing_fee + IFNULL(p.loan_penalty, 0)) AS total_to_repay,
+$sql = "SELECT a.user_id, a.loan_name, a.loan_status, a.loan_purpose, a.loan_amount, a.loan_duration, a.total_payable,
        a.application_date
 FROM applications a
-LEFT JOIN products p ON a.loan_id = p.loan_id
 WHERE a.user_id = ? 
-ORDER BY application_date DESC";
+ORDER BY a.application_date DESC";
 
 $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("i", $user_id);
@@ -46,8 +41,9 @@ if ($result) {
     }
 }
 
-// fetch repayments
-$sql = "SELECT loan_name, amount_paid, repayment_date FROM repayments WHERE user_id = ?";
+// Fetch repayments and calculate total repayment for each loan
+$sql = "SELECT loan_name, SUM(amount_paid) AS total_repayment, repayment_date 
+FROM repayments WHERE user_id = ? GROUP BY loan_name";
 $stmt = $mysqli->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -57,27 +53,7 @@ while ($row = $result->fetch_assoc()) {
     $repayments[] = $row;
 }
 
-// calculate total repayment amount
-$totals = array();
-$sql = "SELECT a.loan_name, a.loan_status, a.loan_purpose, a.loan_amount, a.loan_duration,
-       IFNULL(p.loan_interest, 0) AS interest,
-       IFNULL(p.processing_fee, 0) AS processing_fee,
-       IFNULL(p.loan_penalty, 0) AS penalty,
-       (a.loan_amount + (a.loan_amount * p.loan_interest / 100) + p.processing_fee + IFNULL(p.loan_penalty, 0)) AS total_to_repay
-FROM applications a
-LEFT JOIN products p ON a.loan_id = p.loan_id
-WHERE a.user_id = ?";
 
-$stmt = $mysqli->prepare($sql);
-$stmt->bind_param('i', $user_id);
-$stmt->execute();
-
-$result = $stmt->get_result();
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $totals[] = $row;
-    }
-}
 
 ?>
 
@@ -198,7 +174,7 @@ if ($result->num_rows > 0) {
                                 <div class="modal-footer">
                                     <div class="text-right">
                                         <button type="submit" name="apply_loan" class="btn btn-outline-primary">
-                                            <i class="fas fa-save"></i> Save
+                                            <i class="fas fa-save"></i> Apply
                                         </button>
                                     </div>
                                 </div>
@@ -266,34 +242,35 @@ if ($result->num_rows > 0) {
                             <div class="col-xl-12">
                             <div id="loanstatus" class="content-section" style="display: none;">
                             <h3>My loan status.</h3>
-                            <table id="datatable" class="table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Loan ID</th>
-                                        <th>Loan Name</th>
-                                        <th>Amount</th>
-                                        <th>Amount to repay</th>
-                                        <th>Status</th>
-                                        <th>Application Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                <?php if (!empty($loans)) : ?>
-                                <?php foreach ($loans as $loan) : ?>
-                                    <tr>
-                                        <td><?php echo $loan['user_id']; ?></td>
-                                        <td><?php echo $loan['loan_name']; ?></td>
-                                        <td><?php echo number_format($loan['loan_amount'], 2); ?></td>
-                                        <td><?php echo number_format($loan['total_to_repay'], 2); ?></td>
-                                        <td><?php echo $loan['loan_status']; ?></td>
-                                        <td><?php echo date("d M Y", strtotime($loan['application_date'])); ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                                <?php else : ?>
-                                    <tr><td colspan='5'>No loan applications found</td></tr>
-                                <?php endif; ?>
-                                </tbody>
-                            </table>
+                                <table id="datatable" class="table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Loan ID</th>
+                                            <th>Loan Name</th>
+                                            <th>Amount</th>
+                                            <th>Amount to repay</th>
+                                            <th>Status</th>
+                                            <th>Application Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php if (!empty($loans)) : ?>
+                                        <?php foreach ($loans as $loan) : ?>
+                                            <tr>
+                                                <td><?php echo $loan['user_id']; ?></td>
+                                                <td><?php echo $loan['loan_name']; ?></td>
+                                                <td><?php echo number_format($loan['loan_amount'], 2); ?></td>
+                                                <td><?php echo number_format($loan['total_payable'], 2);?></td>
+                                                <td><?php echo $loan['loan_status']; ?></td>
+                                                <td><?php echo date("d M Y", strtotime($loan['application_date'])); ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else : ?>
+                                        <tr><td colspan='6'>No loan applications found</td></tr>
+                                    <?php endif; ?>
+                                    </tbody>
+                                </table>
+
                             </div>
                             </div>
                             </div>
@@ -315,7 +292,7 @@ if ($result->num_rows > 0) {
                                 <?php foreach ($repayments as $repayment) : ?>
                                 <tr>
                                     <td><?php echo $repayment['loan_name']; ?></td>
-                                    <td><?php echo number_format($repayment['amount_paid'], 2); ?></td>
+                                    <td><?php echo number_format($repayment['total_repayment'], 2); ?></td>
                                     <td><?php echo date("d M Y", strtotime($repayment['repayment_date'])); ?></td>
                                 </tr>
                                 <?php endforeach; ?>

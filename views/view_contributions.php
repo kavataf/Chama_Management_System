@@ -51,6 +51,16 @@ $members_query = $query->get_result();
 
 <body id="page-top">
 
+<style>
+    .no-records {
+    color: #888;
+    font-style: italic;
+    font-size: 16px;
+    padding: 20px 0;
+}
+
+</style>
+
     <!-- Page Wrapper -->
     <div id="wrapper">
 
@@ -96,11 +106,17 @@ $members_query = $query->get_result();
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php while ($row = mysqli_fetch_assoc($members_query)) { ?>
+                                    <?php if (mysqli_num_rows($members_query) > 0) { ?>
+                                        <?php while ($row = mysqli_fetch_assoc($members_query)) { ?>
+                                            <tr>
+                                                <td><?php echo $row['member_name']; ?></td>
+                                                <td><?php echo $row['amount_paid']; ?></td>
+                                                <td><?php echo ucfirst($row['status']); ?></td>
+                                            </tr>
+                                        <?php } ?>
+                                    <?php } else { ?>
                                         <tr>
-                                            <td><?php echo $row['member_name']; ?></td>
-                                            <td><?php echo $row['amount_paid']; ?></td>
-                                            <td><?php echo ucfirst($row['status']); ?></td>
+                                            <td colspan="3" class="text-center no-records text-danger">No records found.</td>
                                         </tr>
                                     <?php } ?>
                                 </tbody>

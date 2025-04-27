@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
 }
+$user_email = $_SESSION['user_email'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['repayment_id'], $_POST['amount'])) {
     $repayment_id = $_POST['repayment_id'];
@@ -64,6 +65,11 @@ if ($user_role == 'System Administrator') {
 ?>
 
 <body id="page-top">
+<style>
+.d-none {
+    display: none !important;
+}
+</style>
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -129,59 +135,146 @@ if ($user_role == 'System Administrator') {
                     <?php elseif ($user_role == 'Member') : ?>
                         <div class="row">
                             <div class="col-lg-12">
-                            <h2>My Loan Installments</h2>
-                            <table class="table table-bordered" id="datatable">
-                                <tr>
-                                    <th>Due Date</th><th>Amount Due</th><th>Paid</th><th>Status</th><th>Action</th>
-                                </tr>
-                                <?php
-                                if ($result->num_rows === 0) {
-                                    echo "<tr><td colspan='5'>⚠️ No repayments found</td></tr>";
-                                }
-                                while ($row = $result->fetch_assoc()) {
-                                    $loan_amount = $row['loan_amount'];
-                                    $due_date = new DateTime($row['due_date']);
-                                    $today = new DateTime();
-                                    $late_fee = 0;
-                                
-                                    if (strtolower(trim($row['status'])) === 'overdue') {
-                                        $days_late = $due_date->diff($today)->days;
-                                        $late_fee = $days_late * 50; // KES 50 per day late fee
+                                <h2>My Loan Installments</h2>
+                                <table class="table table-bordered" id="datatable">
+                                    <tr>
+                                        <th>Due Date</th><th>Amount Due</th><th>Paid</th><th>Status</th><th>Action</th>
+                                    </tr>
+                                    <?php
+                                    if ($result->num_rows === 0) {
+                                        echo "<tr><td colspan='5'>⚠️ No repayments found</td></tr>";
                                     }
-                                
-                                    $total_due = $loan_amount + $late_fee;
-                                ?>
-                                <tr style="background: <?= $row['status'] == 'overdue' ? '#fdd' : '#dfd' ?>;">
-                                    <td><?= $row['due_date'] ?></td>
-                                    <td>
-                                        <?= $loan_amount ?>
-                                        <?php if ($late_fee > 0): ?>
-                                            <br><small class="text-danger">Late Fee: <?= $late_fee ?> <br>Total: <?= $total_due ?></small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?= $row['amount_paid'] ?></td>
-                                    <td><?= ucfirst($row['status']) ?></td>
-                                    <td>
-                                        <?php
-                                        $status = strtolower(trim($row['status']));
-                                        if ($status === 'pending' || $status === 'overdue') {
-                                        ?>
-                                            <form method="POST">
-                                                <input type="hidden" name="repayment_id" value="<?= $row['repayment_id'] ?>">
-                                                <input type="number" name="amount" step="0.01" 
-                                                    max="<?= $total_due ?>" required 
-                                                    class="form-control" 
-                                                    placeholder="Max: <?= $total_due ?>">
-                                                <button type="submit" class="btn btn-outline-success mt-1">Pay</button>
-                                            </form>
-                                        <?php } else {
-                                            echo "✔️ <span class='badge bg-success'>Paid</span>";
-                                        } ?>
+                                    while ($row = $result->fetch_assoc()) {
+                                        $loan_amount = $row['loan_amount'];
+                                        $due_date = new DateTime($row['due_date']);
+                                        $today = new DateTime();
+                                        $late_fee = 0;
 
-                                    </td>
-                                </tr>
-                                <?php } ?>
-                            </table>
+                                        if (strtolower(trim($row['status'])) === 'overdue') {
+                                            $days_late = $due_date->diff($today)->days;
+                                            $late_fee = $days_late * 50; 
+                                        }
+
+                                        $total_due = $loan_amount + $late_fee;
+                                    ?>
+                                    <tr style="background: <?= $row['status'] == 'overdue' ? '#fdd' : '#dfd' ?>;">
+                                        <td><?= $row['due_date'] ?></td>
+                                        <td>
+                                            <?= $loan_amount ?>
+                                            <?php if ($late_fee > 0): ?>
+                                                <br><small class="text-danger">Late Fee: <?= $late_fee ?> <br>Total: <?= $total_due ?></small>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= $row['amount_paid'] ?></td>
+                                        <td><?= ucfirst($row['status']) ?></td>
+                                        <td>
+                                            <?php
+                                            $status = strtolower(trim($row['status']));
+                                            if ($status === 'pending' || $status === 'overdue') {
+                                            ?>
+                                               <!-- Repayment Form -->
+                                                <form id="paymentForm" method="POST">
+                                                    <input type="hidden" name="repayment_id" value="<?= $row['repayment_id'] ?>">
+                                                    <input type="number" name="amount" step="0.01" max="<?= $total_due - $row['amount_paid'] ?>" required class="form-control" placeholder="Max: <?= $total_due - $row['amount_paid'] ?>">
+
+                                                    <!-- Button and Spinner -->
+                                                    <button type="submit" class="btn btn-outline-success mt-1" id="payButton">
+                                                        <span id="buttonText">Pay with M-Pesa</span>
+                                                        <span id="spinner" class="d-none">
+                                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                                <span class="sr-only">Loading...</span>
+                                                            </div>
+                                                        </span>
+                                                    </button>
+                                                </form>
+
+                                            <?php } else {
+                                                echo "✔️ <span class='badge bg-success'>Paid</span>";
+                                            } ?>
+                                        </td>
+                                    </tr>
+                                    <?php } ?>
+                                </table>
+                                
+
+                                <script src="https://js.paystack.co/v1/inline.js"></script>
+
+                                <script>
+                                  const paymentForm = document.getElementById('paymentForm');
+                                    paymentForm.addEventListener("submit", payWithPaystack, false);
+
+                                    function payWithPaystack(e) {
+                                        e.preventDefault();
+
+                                        const payButton = document.getElementById('payButton');
+                                        const buttonText = document.getElementById('buttonText');
+                                        const spinner = document.getElementById('spinner');
+
+                                        // Disable button and show spinner immediately
+                                        payButton.disabled = true;
+                                        buttonText.textContent = 'Processing...';
+                                        spinner.classList.remove('d-none');  
+
+                                        let email = "<?php echo $_SESSION['user_email']; ?>";  
+                                        const amount = document.querySelector('[name="amount"]').value;
+                                        const repaymentId = document.querySelector('[name="repayment_id"]').value;
+
+                                        if (!amount || !repaymentId) {
+                                            alert("Please fill in the required fields.");
+                                            return;
+                                        }
+
+                                        let handler = PaystackPop.setup({
+                                            key: 'pk_test_2d11faf4649f14c3568d4df5f9faddf55ca9a65d',
+                                            amount: amount * 100, 
+                                            email: email, 
+                                            currency: "KES",
+                                            channels: ['mobile_money'], 
+                                            callback: function(response) {
+                                                // Payment successful, hide spinner
+                                                spinner.classList.add('d-none');  
+                                                alert('Payment complete! Reference: ' + response.reference);
+
+                                                // Send the payment reference to the server for verification
+                                                fetch('process_mpesa_payment.php', {
+                                                    method: 'POST',
+                                                    body: JSON.stringify({
+                                                        reference: response.reference,
+                                                        repayment_id: repaymentId,
+                                                        amount: amount
+                                                    }),
+                                                    headers: {
+                                                        'Content-Type': 'application/json'
+                                                    }
+                                                })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (data.status === 'success') {
+                                                        alert('Payment Recorded!');
+                                                        window.location.reload(); // Reload page to reflect changes
+                                                    } else {
+                                                        alert('Error: ' + data.message);
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    alert('Error during payment verification: ' + error.message);
+                                                    console.error('Error:', error);
+                                                });
+                                            },
+                                            onClose: function() {
+                                                // Hide the spinner if the user closes the payment window
+                                                spinner.classList.add('d-none');  
+                                                alert('Transaction was not completed.');
+                                                payButton.disabled = false;  
+                                                buttonText.textContent = 'Pay with M-Pesa'; 
+                                            }
+                                        });
+
+                                        handler.openIframe();  // Open Paystack pop-up for payment
+                                    }
+
+                                </script>
+
                             </div>
                         </div>
 
