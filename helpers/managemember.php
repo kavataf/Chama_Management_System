@@ -34,10 +34,11 @@ if (isset($_POST['update_member'])) {
                 );
 
                 if ($stmt_update->execute()) {
-                    echo "<script>alert('member updated successfully.');</script>";
-                    // $_SESSION['success'] = 'member updated successfully.';
-                    header('Location: ../views/members');
-                    exit();
+                    echo "<script>
+                    alert('member updated successfully.');
+                    window.location.href = '../views/members';
+                  </script>";
+                     exit;
                 } else {
                     echo "Error updating member: " . $stmt_update->error;
                 }
@@ -47,8 +48,13 @@ if (isset($_POST['update_member'])) {
                 echo "Error preparing update query: " . $mysqli->error;
             }
         } else {
-            echo "Error: member not found.";
+            echo "<script>
+                    alert('Member not found.');
+                    window.location.href = '../views/members';
+                  </script>";
+            exit;
         }
+        
 
         $stmt_member->close();
     } else {

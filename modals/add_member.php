@@ -25,9 +25,10 @@ require_once('../config/codeGen.php');
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="">ID No<span class="text-danger">*</span></label>
-                                <input type="text" placeholder="123xxxxx" required name="member_id_no" class="form-control" id="member_id_no" pattern="^\d{8}$" title="ID number must be exactly 8 digits.">
+                                <input type="number" placeholder="Enter 8-digit ID" required name="member_id_no" class="form-control" id="member_id_no" min="10000000" max="99999999" title="ID number must be exactly 8 digits.">
                                 <div class="invalid-feedback">Please enter a valid 8-digit ID number.</div>
                             </div>
+
 
                             <div class="form-group col-md-6">
                                 <label for="">Gender<span class="text-danger">*</span></label>

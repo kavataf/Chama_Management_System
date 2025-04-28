@@ -688,7 +688,7 @@ if($result -> num_rows > 0){
                                                             <h5 class="card-title">${transaction.title}</h5>
                                                             <p class="card-text">
                                                                 <strong>Due Date:</strong> ${transaction.due_date} <br>
-                                                                <strong>Amount Paid:</strong> $${transaction.amount_paid} <br>
+                                                                <strong>Amount Paid:</strong> Ksh${transaction.amount_paid} <br>
                                                                 <strong>Status:</strong> 
                                                                 <span class="badge ${badgeClass}">${transaction.status}</span> <br>
                                                                 <strong>Payment Date:</strong> ${new Date(transaction.payment_date).toLocaleString()}

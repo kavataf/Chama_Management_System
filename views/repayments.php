@@ -193,7 +193,7 @@ $result_repay = $mysqli -> query($repay);
                                     </tr>
                                     <?php
                                     if ($result->num_rows === 0) {
-                                        echo "<tr><td colspan='5'>⚠️ No repayments found</td></tr>";
+                                        echo "<tr><td colspan='5'>⚠️ No Loan installments found</td></tr>";
                                     }
                                     while ($row = $result->fetch_assoc()) {
                                         $loan_amount = $row['loan_amount'];

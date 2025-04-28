@@ -25,16 +25,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $hashed = password_hash($new_password, PASSWORD_DEFAULT);
 
-        $stmt = $mysqli->prepare("UPDATE users SET user_password = ?, user_unhashed_password = NULL WHERE user_id = ?");
+        $stmt = $mysqli->prepare("UPDATE users SET user_password = ? WHERE user_id = ?");
         $stmt->bind_param("si", $hashed, $user_id);
 
         if ($stmt->execute()) {
-            $_SESSION['success'] = "Password updated successfully. You can now log in.";
-            session_destroy(); // force re-login
-            header("location: views/login.php");
-            exit;
+            echo "<script>
+                alert('Password updated successfully. You can now log in.');
+            </script>";
+
+            session_destroy(); 
+            header("Location: views/login.php"); 
+            exit; 
+
         } else {
-            $_SESSION['error'] = "Error updating password. Please try again.";
+            echo "<script>
+                alert('Error updating password. Please try again.');
+            </script>";
+            exit; 
+            // $_SESSION['error'] = "Error updating password. Please try again.";
         }
     }
 }
@@ -58,25 +66,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     </div>
                 <?php endif; ?>
 
-                <?php if (isset($_SESSION['success'])): ?>
+                <!-- <?php if (isset($_SESSION['success'])): ?>
                     <div class="alert alert-success">
                         <?= $_SESSION['success']; unset($_SESSION['success']); ?>
                     </div>
-                <?php endif; ?>
+                <?php endif; ?> -->
 
                 <form method="post">
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-3 d-flex flex-column">
                         <label for="new_password" class="form-label">New Password</label>
-                        <input type="password" class="form-control" name="new_password" required>
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock" id="togglePassword" onclick="togglePasswordVisibility()"></span>
+                        <div class="d-flex flex-lg-row">
+                            <input type="password" class="form-control" name="new_password" id="new_password" required>
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock" id="togglePassword" onclick="togglePasswordVisibility()"></span>
+                                </div>
                             </div>
                         </div>
+                        <div id="password-strength-message" style="font-size: 12px; color: red;"></div>
                     </div>
                     <div class="mb-3">
                         <label for="confirm_password" class="form-label">Confirm New Password</label>
-                        <input type="password" class="form-control" name="confirm_password" required>
+                        <input type="password" class="form-control" name="confirm_password" id="confirm_password" required>
+                        <div id="password-match-message" style="font-size: 12px; color: red;"></div>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Set Password</button>
                 </form>
@@ -110,5 +122,48 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 icon.classList.add("fa-lock");
             }
         }
+
+
+        // Password strength checker
+        document.getElementById("new_password").addEventListener("input", function() {
+            const password = this.value;
+            const strengthMessage = document.getElementById("password-strength-message");
+            
+            let strength = "Weak";
+            let color = "red";
+            let message = "Password must be at least 8 characters long, with uppercase, lowercase, digits, and symbols.";
+
+            // Check password strength
+            if (password.length >= 8) {
+                if (/[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                    strength = "Strong";
+                    color = "green";
+                    message = "Password is strong!";
+                } else if (/[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password)) {
+                    strength = "Moderate";
+                    color = "orange";
+                    message = "Password should include symbols.";
+                }
+            }
+            
+            strengthMessage.textContent = message;
+            strengthMessage.style.color = color;
+        });
+
+        // Confirm password match checker
+        document.getElementById("confirm_password").addEventListener("input", function() {
+            const newPassword = document.getElementById("new_password").value;
+            const confirmPassword = this.value;
+            const matchMessage = document.getElementById("password-match-message");
+            
+            if (newPassword !== confirmPassword) {
+                matchMessage.textContent = "Passwords do not match!";
+                matchMessage.style.color = "red";
+            } else {
+                matchMessage.textContent = "Passwords match!";
+                matchMessage.style.color = "green";
+            }
+        });
+
     </script>
 </body>

@@ -15,6 +15,7 @@ if(isset($_POST['savings_details'])){
     $amount, $date, $payment_method);
 
     if ($stmt->execute()) {
+        
         $_SESSION['success'] = "savings details added successfully";
         // header("location: savings.php");
         exit;

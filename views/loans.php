@@ -38,6 +38,7 @@ FROM products");
 if ($result) {
     while ($row = $result->fetch_assoc()) {
         $products[] = $row;
+        $maximum_limit = $row['maximum_limit'];
     }
 }
 
@@ -150,7 +151,8 @@ while ($row = $result->fetch_assoc()) {
                                         <!-- Loan Amount (editable) -->
                                         <div class="form-group col-md-6">
                                             <label for="loan_amount">Loan Amount<span class="text-danger">*</span></label>
-                                            <input type="number" required name="loan_amount" id="loan_amount" class="form-control" min="1" step="any" placeholder="Enter loan amount">
+                                            <input type="number" required name="loan_amount" id="loan_amount" class="form-control" min="1" 
+                                            step="any" placeholder="Enter loan amount">
                                         </div>
 
                                         <!-- Interest Rate (readonly) -->
@@ -203,12 +205,12 @@ while ($row = $result->fetch_assoc()) {
                                         return;
                                     }
 
-                                    spinner.style.display = 'inline-block'; // SHOW spinner
+                                    spinner.style.display = 'inline-block'; 
 
                                     fetch(`get_loan_details.php?loan_name=${encodeURIComponent(selectedLoan)}`)
                                         .then(response => response.json())
                                         .then(data => {
-                                            spinner.style.display = 'none'; // HIDE spinner
+                                            spinner.style.display = 'none'; 
 
                                             if (data.status === 'success') {
                                                 const loan = data.data;
@@ -223,7 +225,7 @@ while ($row = $result->fetch_assoc()) {
                                             }
                                         })
                                         .catch(error => {
-                                            spinner.style.display = 'none'; // HIDE spinner
+                                            spinner.style.display = 'none'; 
                                             console.error('Error fetching loan details:', error);
                                             alert('Something went wrong. Try again.');
                                             clearLoanFields();

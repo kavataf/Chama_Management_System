@@ -191,7 +191,7 @@ if ($result->num_rows > 0) {
                                                         <th style="width: 10px">No</th>
                                                         <th>Loan Name</th>
                                                         <th>Maximum Amount</th>
-                                                        <th>Loan Interest</th>
+                                                        <th>Loan Interest (%)</th>
                                                         <th>Loan Duration (months)</th>
                                                         <th>Guarantors</th>
                                                     </tr>

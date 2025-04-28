@@ -173,7 +173,7 @@ if($result -> num_rows > 0){
                 loanRows += `
                 <tr>
                     <td>${loan.loan_name}</td>
-                    <td>$${loan.loan_amount}</td>
+                    <td>Ksh${loan.loan_amount}</td>
                     <td><span class="badge ${getStatusClass(loan.loan_status)}">${loan.loan_status}</span></td>
                     <td>${loan.application_date}</td>
                 </tr>
@@ -201,7 +201,6 @@ if($result -> num_rows > 0){
                 <li class="list-group-item"><strong>Phone:</strong> ${m.phone}</li>
                 <li class="list-group-item"><strong>Email:</strong> ${m.email}</li>
                 <li class="list-group-item"><strong>Date Joined:</strong> ${m.joined}</li>
-                <li class="list-group-item"><strong>Last Login:</strong> ${m.lastLogin}</li>
             </ul>
 
             <h5 class="mt-4">Loan Applications</h5>

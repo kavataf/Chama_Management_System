@@ -11,7 +11,7 @@ use PHPMailer\PHPMailer\Exception;
 if (isset($_POST['member_details'])) {
     $member_name = trim($_POST['member_name']);
     $member_gender = trim($_POST['member_gender']);
-    $member_id_no = trim($_POST['member_id_no']);
+    $member_id_no = (int) trim($_POST['member_id_no']);
     $member_email = trim($_POST['member_email']);
     $member_phone = trim($_POST['member_phone']);
     $member_password = bin2hex(random_bytes(8)); // Generate a random password
@@ -19,16 +19,30 @@ if (isset($_POST['member_details'])) {
     $access_level = 'Member';
     $status = 'active';
 
+    // Check if ID No or Email already exists
+    $check_sql = "SELECT * FROM members WHERE member_id_no = ? OR member_email = ?";
+    $stmt = $mysqli->prepare($check_sql);
+    $stmt->bind_param('is', $member_id_no, $member_email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // If found, stop and show error
+    if ($result->num_rows > 0) {
+        echo "<script>alert('ID number or Email already exists. Please use different details.'); 
+        window.location.href='../views/members';</script>";
+        exit();
+    }
+
     // Start transaction
     $mysqli->begin_transaction();
 
     try {
         // Insert into users table
         $stmt = $mysqli->prepare("INSERT INTO users (user_name, user_gender, user_id_no, 
-            user_email, user_phone, user_access_level, user_password, user_unhashed_password) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssssss", $member_name, $member_gender, $member_id_no, $member_email, 
-            $member_phone, $access_level, $hashed_password, $member_password);
+            user_email, user_phone, user_access_level, user_password) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssissss", $member_name, $member_gender, $member_id_no, $member_email, 
+            $member_phone, $access_level, $hashed_password);
 
         if ($stmt->execute()) {
             $user_id = $mysqli->insert_id;
@@ -37,7 +51,7 @@ if (isset($_POST['member_details'])) {
             // Insert into members table
             $stmt2 = $mysqli->prepare("INSERT INTO members (user_id, member_name, member_gender, 
                 member_email, member_phone, member_id_no, member_status) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt2->bind_param("issssss", $user_id, $member_name, $member_gender, 
+            $stmt2->bind_param("issssis", $user_id, $member_name, $member_gender, 
                 $member_email, $member_phone, $member_id_no, $status);
 
             if ($stmt2->execute()) {
@@ -78,10 +92,11 @@ if (isset($_POST['member_details'])) {
                     header("location: members.php");
                     exit;
                 }
-                echo "<script>alert('Member added successfully. Password has been sent to the email.');</script>";
-                // $_SESSION['success'] = "Member added successfully. Password has been sent to the email.";
-                header("location: members.php");
-                exit;
+                echo "<script>
+                    alert('Member added successfully. Password has been sent to the email.');
+                    window.location.href = '../views/members';
+                  </script>";
+                     exit;
 
             } else {
                 throw new Exception("Failed to insert into members table: " . $stmt2->error);
